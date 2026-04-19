@@ -24,11 +24,3 @@ def search_books(query):
     except Exception as e:
         print(e)
         return []
-
-
-if __name__ == "__main__":
-    query = input("Введите название книги для теста: ")
-    books = search_books(query)
-    for i, book in enumerate(books, 1):
-        print(f"{i}. {book['title']} — {book['author']} ({book['first_publish_year']})")
-        print(f"   Обложка: {book['cover_url']}")
