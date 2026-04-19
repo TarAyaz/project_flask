@@ -5,20 +5,24 @@
 >
   <div class="col-md-6 col-lg-4 border rounded p-4 shadow-sm bg-light">
     <h1 class="text-center mb-4">Авторизация</h1>
+    {% if message %}
+    <div class="alert alert-danger text-center" role="alert">{{ message }}</div>
+    {% endif %}
     <form action="" method="post" novalidate>
       {{ form.hidden_tag() }}
+
       <div class="mb-3">
         {{ form.username.label(class="form-label") }} {{
         form.username(class="form-control") }} {% for error in
         form.username.errors %}
-        <div class="alert alert-danger py-2 mt-1">{{ error }}</div>
+        <div class="alert alert-danger py-1 mt-1 small">{{ error }}</div>
         {% endfor %}
       </div>
       <div class="mb-3">
         {{ form.password.label(class="form-label") }} {{
         form.password(class="form-control", type="password") }} {% for error in
         form.password.errors %}
-        <div class="alert alert-danger py-2 mt-1">{{ error }}</div>
+        <div class="alert alert-danger py-1 mt-1 small">{{ error }}</div>
         {% endfor %}
       </div>
       <div class="mb-3 form-check">
@@ -29,6 +33,12 @@
         {{ form.submit(type="submit", class="btn btn-primary btn-lg") }}
       </div>
     </form>
+    <div class="text-center mt-3">
+      <small class="text-muted"
+        >Нет аккаунта?
+        <a href="{{ url_for('auth.register') }}">Зарегистрироваться</a></small
+      >
+    </div>
   </div>
 </div>
 {% endblock %}

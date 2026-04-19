@@ -1,10 +1,11 @@
 import datetime
 import sqlalchemy
 from sqlalchemy import orm
+from flask_login import UserMixin
 from .db_session import SqlAlchemyBase
 
 
-class User(SqlAlchemyBase):
+class User(SqlAlchemyBase, UserMixin):
     __tablename__ = "users"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     username = sqlalchemy.Column(sqlalchemy.String, nullable=False, unique=True)
@@ -13,11 +14,9 @@ class User(SqlAlchemyBase):
     )
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+
     books = orm.relationship("Book", back_populates="user")
     searches = orm.relationship("SearchQuery", back_populates="user")
-
-    def __repr__(self):
-        return f"<User {self.username}>"
 
 
 class Book(SqlAlchemyBase):
@@ -29,13 +28,9 @@ class Book(SqlAlchemyBase):
     isbn = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     language = sqlalchemy.Column(sqlalchemy.String, default="ru")
     cover_url = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
     timestamp = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship("User", back_populates="books")
-
-    def __repr__(self):
-        return f"<Book {self.title}>"
 
 
 class SearchQuery(SqlAlchemyBase):
@@ -45,6 +40,3 @@ class SearchQuery(SqlAlchemyBase):
     timestamp = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship("User", back_populates="searches")
-
-    def __repr__(self):
-        return f"<Search {self.query}>"

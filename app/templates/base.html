@@ -43,6 +43,12 @@
         </ul>
 
         <div class="col-md-3 text-end">
+          {% if current_user.is_authenticated %}
+          <span class="me-2 text-muted">{{ current_user.username }}</span>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger"
+            >Выход</a
+          >
+          {% else %}
           <a
             href="{{ url_for('auth.login') }}"
             class="btn btn-outline-primary me-2"
@@ -51,6 +57,7 @@
           <a href="{{ url_for('auth.register') }}" class="btn btn-primary"
             >Регистрация</a
           >
+          {% endif %}
         </div>
       </header>
     </div>
