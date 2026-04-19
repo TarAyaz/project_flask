@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Библиотека{% endblock %}</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <div class="container">
+      <header
+        class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom"
+      >
+        <div class="col-md-3 mb-2 mb-md-0">
+          <a
+            href="{{ url_for('main.index') }}"
+            class="d-inline-flex link-body-emphasis text-decoration-none align-items-center"
+          >
+            <img
+              src="{{ url_for('static', filename='library.png') }}"
+              alt="Logo"
+              width="40"
+              height="40"
+              class="me-2"
+            />
+            <span class="fs-4">MyLibrary</span>
+          </a>
+        </div>
+
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li>
+            <a
+              href="{{ url_for('main.index') }}"
+              class="nav-link px-2 link-secondary"
+              >Главная</a
+            >
+          </li>
+          <li><a href="#" class="nav-link px-2">Поиск</a></li>
+          <li><a href="#" class="nav-link px-2">О проекте</a></li>
+        </ul>
+
+        <div class="col-md-3 text-end">
+          <button type="button" class="btn btn-outline-primary me-2">
+            Вход
+          </button>
+          <button type="button" class="btn btn-primary">Регистрация</button>
+        </div>
+      </header>
+    </div>
+
+    <main class="container flex-grow-1">{% block content %}{% endblock %}</main>
+
+    <div class="container">
+      <footer
+        class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"
+      >
+        <div class="col-md-4 d-flex align-items-center">
+          <span class="mb-3 mb-md-0 text-body-secondary"
+            >© 2026 MyLibrary Project</span
+          >
+        </div>
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
