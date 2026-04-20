@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from flask_wtf.file import FileAllowed, FileField
 from wtforms.validators import DataRequired, Email, EqualTo
 
 
@@ -22,3 +23,11 @@ class LoginForm(FlaskForm):
     password = PasswordField("Пароль", validators=[DataRequired()])
     remember_me = BooleanField("Запомнить меня")
     submit = SubmitField("Войти")
+
+
+class EditProfileForm(FlaskForm):
+    username = StringField("Новый логин", validators=[DataRequired()])
+    avatar = FileField(
+        "Сменить аватарку", validators=[FileAllowed(["jpg", "png", "jpeg"])]
+    )
+    submit = SubmitField("сохранить")

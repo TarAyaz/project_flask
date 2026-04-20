@@ -13,6 +13,7 @@ class User(SqlAlchemyBase, UserMixin):
         sqlalchemy.String, index=True, unique=True, nullable=False
     )
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    avatar_file = sqlalchemy.Column(sqlalchemy.String, default="default_avatar.png")
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     books = orm.relationship("Book", back_populates="user")
