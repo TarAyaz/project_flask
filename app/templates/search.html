@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-10">
+    <div class="text-center mb-5">
+      <h1 class="display-5 fw-bold">Поиск книг</h1>
+      <p class="text-muted">Введите название или автора</p>
+    </div>
+
+    <div class="card mb-5 shadow-sm border-0 bg-light">
+      <div class="card-body p-4">
+        <form action="" method="post" class="row g-3" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="col-md-9">
+            {{ form.query(class="form-control form-control-lg",
+            placeholder="Например: Мастер и Маргарита...") }} {% for error in
+            form.query.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-md-3 d-grid">
+            {{ form.submit(class="btn btn-primary btn-lg") }}
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {% if books %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for book in books %}
+      <div class="col">
+        <div class="card h-100 shadow-sm border-0 bg-white">
+          <div class="row g-0">
+            <div class="col-4">
+              {% if book.cover_url %}
+              <img
+                src="{{ book.cover_url }}"
+                class="img-fluid rounded-start h-100 w-100"
+                style="object-fit: cover"
+                alt="Обложка"
+              />
+              {% else %}
+              <div
+                class="bg-secondary text-white d-flex align-items-center justify-content-center h-100 rounded-start"
+                style="min-height: 180px"
+              >
+                <small>Нет обложки</small>
+              </div>
+              {% endif %}
+            </div>
+            <div class="col-8">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title fw-bold">{{ book.title }}</h5>
+                <p class="card-text text-muted mb-1 small">
+                  <strong>Автор:</strong> {{ book.author }}
+                </p>
+                {% if book.first_publish_year %}
+                <p class="card-text mb-3 small">
+                  <span class="badge bg-light text-dark border"
+                    >Год: {{ book.first_publish_year }}</span
+                  >
+                </p>
+                {% endif %}
+
+                <div class="mt-auto">
+                  <button class="btn btn-sm btn-success w-100">
+                    <i class="bi bi-plus-circle me-1"></i> На полку
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% elif form.query.data %}
+    <div class="text-center py-5">
+      <i class="bi bi-search text-muted" style="font-size: 3rem"></i>
+      <p class="mt-3 text-muted">
+        К сожалению, по запросу "<strong>{{ form.query.data }}</strong>" ничего
+        не найдено.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

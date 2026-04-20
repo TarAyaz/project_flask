@@ -34,12 +34,18 @@
           <li>
             <a
               href="{{ url_for('main.index') }}"
-              class="nav-link px-2 link-secondary"
+              class="nav-link px-2 {% if request.endpoint == 'main.index' %}link-secondary{% else %}link-dark{% endif %}"
               >Главная</a
             >
           </li>
-          <li><a href="#" class="nav-link px-2">Поиск</a></li>
-          <li><a href="#" class="nav-link px-2">О проекте</a></li>
+          <li>
+            <a
+              href="{{ url_for('main.search') }}"
+              class="nav-link px-2 {% if request.endpoint == 'main.search' %}link-secondary{% else %}link-dark{% endif %}"
+              >Поиск</a
+            >
+          </li>
+          <li><a href="#" class="nav-link px-2 link-dark">О проекте</a></li>
         </ul>
 
         <div class="col-md-3 text-end">
@@ -62,7 +68,23 @@
       </header>
     </div>
 
-    <main class="container flex-grow-1">{% block content %}{% endblock %}</main>
+    <main class="container flex-grow-1">
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for
+      message in messages %}
+      <div
+        class="alert alert-info alert-dismissible fade show shadow-sm"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %} {% block content %}{% endblock %}
+    </main>
 
     <div class="container">
       <footer
