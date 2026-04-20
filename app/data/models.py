@@ -29,6 +29,7 @@ class Book(SqlAlchemyBase):
     isbn = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     language = sqlalchemy.Column(sqlalchemy.String, default="ru")
     cover_url = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    status = sqlalchemy.Column(sqlalchemy.String, default="Хочу прочитать")
     timestamp = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
     user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship("User", back_populates="books")

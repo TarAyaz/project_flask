@@ -13,7 +13,7 @@ from app.forms.book import SearchForm
 from app.forms.user import EditProfileForm
 from app.utils.open_library_api import search_books
 from app.data import db_session
-from app.data.models import User
+from app.data.models import User, Book
 
 bp = Blueprint("main", __name__)
 
@@ -47,6 +47,38 @@ def profile():
     return render_template(
         "profile.html", title="Профиль", form=form, avatar_path=avatar_path
     )
+
+
+@bp.route("/add_to_shelf", methods=["POST"])
+@login_required
+def add_to_shelf():
+    db_sess = db_session.create_session()
+    title = request.form.get("title")
+    author = request.form.get("author")
+    isbn = request.form.get("isbn")
+    cover_url = request.form.get("cover_url")
+    status = request.form.get("status", "Хочу прочитать")
+    existing_book = (
+        db_sess.query(Book)
+        .filter(Book.user_id == current_user.id, Book.isbn == isbn)
+        .first()
+    )
+    if existing_book:
+        flash(f"Книга '{title}' уже есть на вашей полке!", "info")
+    else:
+        new_book = Book(
+            title=title,
+            author=author,
+            isbn=isbn,
+            cover_url=cover_url,
+            status=status,
+            user_id=current_user.id,
+        )
+        db_sess.add(new_book)
+        db_sess.commit()
+        flash(f"Книга '{title}' добавлена на полку!", "success")
+
+    return redirect(url_for("main.search"))
 
 
 @bp.route("/")

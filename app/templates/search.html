@@ -53,8 +53,9 @@
                 <p class="card-text text-muted mb-1 small">
                   <strong>Автор:</strong> {{ book.author }}
                 </p>
+
                 {% if book.first_publish_year %}
-                <p class="card-text mb-3 small">
+                <p class="card-text mb-2 small">
                   <span class="badge bg-light text-dark border"
                     >Год: {{ book.first_publish_year }}</span
                   >
@@ -62,9 +63,47 @@
                 {% endif %}
 
                 <div class="mt-auto">
-                  <button class="btn btn-sm btn-success w-100">
-                    <i class="bi bi-plus-circle me-1"></i> На полку
-                  </button>
+                  {% if current_user.is_authenticated %}
+                  <form
+                    action="{{ url_for('main.add_to_shelf') }}"
+                    method="post"
+                  >
+                    <input
+                      type="hidden"
+                      name="title"
+                      value="{{ book.title }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="author"
+                      value="{{ book.author }}"
+                    />
+                    <input type="hidden" name="isbn" value="{{ book.isbn }}" />
+                    <input
+                      type="hidden"
+                      name="cover_url"
+                      value="{{ book.cover_url }}"
+                    />
+
+                    <div class="input-group input-group-sm mb-2">
+                      <select name="status" class="form-select">
+                        <option value="Хочу прочитать">Хочу прочитать</option>
+                        <option value="Читаю">Читаю</option>
+                        <option value="Прочитано">Прочитано</option>
+                      </select>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-success w-100">
+                      Добавить на полку
+                    </button>
+                  </form>
+                  {% else %}
+                  <a
+                    href="{{ url_for('auth.login') }}"
+                    class="btn btn-sm btn-outline-secondary w-100"
+                  >
+                    Войдите, чтобы добавить
+                  </a>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -75,10 +114,8 @@
     </div>
     {% elif form.query.data %}
     <div class="text-center py-5">
-      <i class="bi bi-search text-muted" style="font-size: 3rem"></i>
       <p class="mt-3 text-muted">
-        К сожалению, по запросу "<strong>{{ form.query.data }}</strong>" ничего
-        не найдено.
+        По запросу "<strong>{{ form.query.data }}</strong>" ничего не найдено.
       </p>
     </div>
     {% endif %}
