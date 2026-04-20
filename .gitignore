@@ -1,5 +1,5 @@
 __pycache__/
-*.py[cod]
-*$py.class
 *.db
-venv/
+instance/
+app/static/profile_pics/*
+!app/static/profile_pics/default_avatar.png
