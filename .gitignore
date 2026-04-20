@@ -3,3 +3,4 @@ __pycache__/
 instance/
 app/static/profile_pics/*
 !app/static/profile_pics/default_avatar.png
+venv/
