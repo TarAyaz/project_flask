@@ -81,16 +81,29 @@
               style="height: 200px; object-fit: cover"
               alt="Обложка"
             />
-            <div class="card-body p-2 text-center">
-              <h6
-                class="card-title mb-1 text-truncate"
-                title="{{ book.title }}"
-              >
+            <div class="card-body p-2 text-center d-flex flex-column">
+              <h6 class="card-title mb-1 text-truncate" title="{{ book.title }}">
                 {{ book.title }}
               </h6>
-              <p class="card-text small text-muted text-truncate">
+              <p class="card-text small text-muted text-truncate mb-2">
                 {{ book.author }}
               </p>
+        
+              <div class="mt-auto">
+                <form action="{{ url_for('main.update_book_status', book_id=book.id) }}" method="post" class="mb-1">
+                  <select name="status" class="form-select form-select-sm mb-1" onchange="this.form.submit()">
+                    <option value="Хочу прочитать" {% if book.status == 'Хочу прочитать' %}selected{% endif %}>В планы</option>
+                    <option value="Читаю" {% if book.status == 'Читаю' %}selected{% endif %}>Читаю</option>
+                    <option value="Прочитано" {% if book.status == 'Прочитано' %}selected{% endif %}>Прочитано</option>
+                  </select>
+                </form>
+        
+                <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Удалить книгу?')">
+                  <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none" style="text-decoration: none; font-size: 0.8rem;">
+                    Удалить
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>

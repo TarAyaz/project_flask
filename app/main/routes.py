@@ -114,3 +114,42 @@ def my_shelf():
     }
 
     return render_template("my_shelf.html", title="Моя полка", shelf=shelf)
+
+
+@bp.route("/delete_book/<int:book_id>", methods=["POST"])
+@login_required
+def delete_book(book_id):
+    db_sess = db_session.create_session()
+
+    book = (
+        db_sess.query(Book)
+        .filter(Book.id == book_id, Book.user_id == current_user.id)
+        .first()
+    )
+    if book:
+        db_sess.delete(book)
+        db_sess.commit()
+        flash("Книга удалена с полки", "success")
+    else:
+        flash("Книга не найдена", "danger")
+
+    return redirect(url_for("main.my_shelf"))
+
+
+@bp.route("/update_book_status/<int:book_id>", methods=["POST"])
+@login_required
+def update_book_status(book_id):
+    db_sess = db_session.create_session()
+    book = (
+        db_sess.query(Book)
+        .filter(Book.id == book_id, Book.user_id == current_user.id)
+        .first()
+    )
+
+    new_status = request.form.get("status")
+    if book and new_status:
+        book.status = new_status
+        db_sess.commit()
+        flash(f"Статус книги '{book.title}' изменен", "success")
+
+    return redirect(url_for("main.my_shelf"))
