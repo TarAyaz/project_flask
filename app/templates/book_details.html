@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm">
+        {% if cover_url %}
+        <img
+          src="{{ cover_url }}"
+          class="img-fluid rounded shadow"
+          alt="Обложка"
+        />
+        {% else %}
+        <div
+          class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+          style="min-height: 400px"
+        >
+          <span>Нет обложки</span>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="d-grid mt-3">
+        {% if search_query %}
+        <a
+          href="{{ url_for('main.search', q=search_query) }}"
+          class="btn btn-outline-secondary"
+        >
+          <i class="bi bi-arrow-left"></i> Назад к результатам
+        </a>
+        {% else %}
+        <a
+          href="{{ url_for('main.search') }}"
+          class="btn btn-outline-secondary"
+        >
+          Назад к поиску
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-md-8">
+      <h1 class="display-4 fw-bold mb-3">{{ book.title }}</h1>
+
+      <h4 class="text-primary mt-4">Описание</h4>
+      <p class="lead" style="white-space: pre-line">{{ book.description }}</p>
+
+      {% if book.subjects %}
+      <h4 class="text-primary mt-4">Жанры / Темы</h4>
+      <div class="d-flex flex-wrap gap-2">
+        {% for subject in book.subjects %}
+        <span class="badge bg-light text-dark border">{{ subject }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

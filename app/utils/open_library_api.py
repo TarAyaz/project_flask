@@ -14,6 +14,7 @@ def search_books(query):
                 "author": ", ".join(d.get("author_name", ["Неизвестен"])),
                 "isbn": d.get("isbn", [None])[0],
                 "first_publish_year": d.get("first_publish_year"),
+                "key": d.get("key"),
                 "cover_url": f"https://covers.openlibrary.org/b/id/{d.get('cover_i')}-M.jpg"
                 if d.get("cover_i")
                 else None,

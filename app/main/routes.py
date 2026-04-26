@@ -1,4 +1,5 @@
 import os
+import requests
 from flask import (
     Blueprint,
     render_template,
@@ -93,12 +94,12 @@ def index():
 def search():
     form = SearchForm()
     books = []
+    query_from_url = request.args.get("q")
     if form.validate_on_submit():
         books = search_books(form.query.data)
-    elif request.args.get("q"):
-        query = request.args.get("q")
-        form.query.data = query
-        books = search_books(query)
+    elif query_from_url:
+        form.query.data = query_from_url
+        books = search_books(query_from_url)
     return render_template("search.html", title="Поиск", form=form, books=books)
 
 
@@ -153,3 +154,33 @@ def update_book_status(book_id):
         flash(f"Статус книги '{book.title}' изменен", "success")
 
     return redirect(url_for("main.my_shelf"))
+
+
+@bp.route("/book/<path:ol_id>")
+def book_details(ol_id):
+    search_query = request.args.get("q", "")
+    url = f"https://openlibrary.org/{ol_id}.json"
+    response = requests.get(url)
+    data = response.json()
+    description = data.get("description", "Описание отсутствует")
+    if isinstance(description, dict):
+        description = description.get("value")
+
+    book = {
+        "title": data.get("title"),
+        "description": description,
+        "subjects": data.get("subjects", [])[:10],
+        "covers": data.get("covers", []),
+    }
+
+    cover_url = None
+    if book["covers"]:
+        cover_url = f"https://covers.openlibrary.org/b/id/{book['covers'][0]}-L.jpg"
+
+    return render_template(
+        "book_details.html",
+        title=book["title"],
+        book=book,
+        cover_url=cover_url,
+        search_query=search_query,
+    )
