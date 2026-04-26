@@ -1,5 +1,6 @@
 import datetime
 import sqlalchemy
+from app.utils.crypto import CryptoManager
 from sqlalchemy import orm
 from flask_login import UserMixin
 from .db_session import SqlAlchemyBase
@@ -18,6 +19,22 @@ class User(SqlAlchemyBase, UserMixin):
 
     books = orm.relationship("Book", back_populates="user")
     searches = orm.relationship("SearchQuery", back_populates="user")
+
+    @property
+    def password(self):
+        if self.hashed_password:
+            return CryptoManager.decrypt(self.hashed_password)
+        return None
+
+    @password.setter
+    def password(self, value):
+        if value:
+            self.hashed_password = CryptoManager.encrypt(value)
+        else:
+            self.hashed_password = None
+
+    def check_password(self, password):
+        return self.password == password
 
 
 class Book(SqlAlchemyBase):

@@ -13,7 +13,7 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.username == form.username.data).first()
-        if user and user.hashed_password == form.password.data:
+        if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template(
@@ -55,8 +55,8 @@ def register():
         user = User(
             username=form.username.data,
             email=form.email.data,
-            hashed_password=form.password.data,
         )
+        user.password = form.password.data
         db_sess.add(user)
         db_sess.commit()
         return redirect("/login")
