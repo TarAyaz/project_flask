@@ -70,6 +70,12 @@
                   >
                     <input
                       type="hidden"
+                      name="last_search_query"
+                      value="{{ form.query.data }}"
+                    />
+
+                    <input
+                      type="hidden"
                       name="title"
                       value="{{ book.title }}"
                     />
@@ -92,6 +98,7 @@
                         <option value="Прочитано">Прочитано</option>
                       </select>
                     </div>
+
                     <button type="submit" class="btn btn-sm btn-success w-100">
                       Добавить на полку
                     </button>

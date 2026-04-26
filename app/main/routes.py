@@ -57,14 +57,17 @@ def add_to_shelf():
     author = request.form.get("author")
     isbn = request.form.get("isbn")
     cover_url = request.form.get("cover_url")
-    status = request.form.get("status", "Хочу прочитать")
+    status = request.form.get("status")
+    query = request.form.get("last_search_query")
     existing_book = (
         db_sess.query(Book)
-        .filter(Book.user_id == current_user.id, Book.isbn == isbn)
+        .filter(
+            Book.user_id == current_user.id, Book.title == title, Book.author == author
+        )
         .first()
     )
     if existing_book:
-        flash(f"Книга '{title}' уже есть на вашей полке!", "info")
+        flash(f"Книга '{title}' уже есть на полке!", "info")
     else:
         new_book = Book(
             title=title,
@@ -76,9 +79,9 @@ def add_to_shelf():
         )
         db_sess.add(new_book)
         db_sess.commit()
-        flash(f"Книга '{title}' добавлена на полку!", "success")
+        flash(f"Книга '{title}' добавлена в раздел '{status}'!", "success")
 
-    return redirect(url_for("main.search"))
+    return redirect(url_for("main.search", q=query))
 
 
 @bp.route("/")
@@ -92,4 +95,22 @@ def search():
     books = []
     if form.validate_on_submit():
         books = search_books(form.query.data)
+    elif request.args.get("q"):
+        query = request.args.get("q")
+        form.query.data = query
+        books = search_books(query)
     return render_template("search.html", title="Поиск", form=form, books=books)
+
+
+@bp.route("/my_shelf")
+@login_required
+def my_shelf():
+    db_sess = db_session.create_session()
+    books = db_sess.query(Book).filter(Book.user_id == current_user.id).all()
+    shelf = {
+        "reading": [b for b in books if b.status == "Читаю"],
+        "plan": [b for b in books if b.status == "Хочу прочитать"],
+        "completed": [b for b in books if b.status == "Прочитано"],
+    }
+
+    return render_template("my_shelf.html", title="Моя полка", shelf=shelf)
