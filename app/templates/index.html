@@ -1,95 +1,98 @@
 {% extends "base.html" %} {% block content %}
 <div
   class="p-5 mb-4 text-white rounded-3 shadow-lg"
-  style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ url_for('static', filename='background.jpg') }}'); 
-            background-size: cover; background-position: center; min-height: 450px; display: flex; align-items: center; border: none;"
+  style="background-image: linear-gradient(rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.0)), url('{{ url_for('static', filename='new_background.png') }}'); 
+            background-size: cover; background-position: center; min-height: 450px; display: flex; align-items: center; border: none; font-family: 'Varela Round', !important"
 >
-  <div class="container-fluid py-5 text-center w-100">
-    <h1 class="display-3 fw-bold">Твоя личная библиотека</h1>
-    <p class="col-md-8 fs-4 mx-auto mb-4">
+  <div class="container-fluid py-5 text-start w-100">
+    <div class="mb-4">
+      <span class="badge rounded-pill" 
+          style="background-color: rgba(57, 31, 184, 0.6); 
+                 border: 1px solid rgba(139, 92, 246, 0.3); 
+                 color: rgba(255, 255, 255, 0.75);
+                 padding: 12px 20px; 
+                 font-size: 1rem;
+                 font-weight: 400;
+                 backdrop-filter: blur(5px);">
+        <i class="bi bi-star-fill me-2" style="color: #8b5cf6;"></i>
+        Ваша личная библиотека
+      </span>
+    </div>
+    <h1 class="display-4 fw-bold">Твоя личная <br> библиотека</h1>
+    <p class="col-md-4 fs-6 mb-4" style = "color: rgba(255, 255, 255, 0.75)">
       Управляйте своей коллекцией книг, отслеживайте прогресс чтения и находите
       новые шедевры через мировые архивы.
     </p>
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-start">
       <a
         href="{{ url_for('main.search') }}"
-        class="btn btn-primary btn-lg px-5 shadow"
-        >Начать поиск</a
+        class="btn btn-lg btn-lg px-5 shadow"
+        style="background: linear-gradient(135deg, #391fb8, #8b5cf6); border: none; color: white; font-family: 'Varela Round', !important"
+        > <i class="bi bi-search me-2"></i> Начать поиск</a
       >
     </div>
   </div>
 </div>
 
-<div class="row g-4 py-5 row-cols-1 row-cols-lg-3 text-center">
-  <div class="feature col">
-    <div
-      class="feature-icon bg-primary bg-gradient text-white mb-3 rounded-circle mx-auto d-flex align-items-center justify-content-center"
-      style="width: 4.5rem; height: 4.5rem"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="currentColor"
-        class="bi bi-search"
-        viewBox="0 0 16 16"
-      >
-        <path
-          d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
-        />
-      </svg>
+<div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+  
+  <!-- Карточка 1: Поиск -->
+  <div class="col">
+    <div class="card h-100 border-0 shadow-sm p-4 text-center" style="background-color: #ffffff; border-radius: 20px;">
+      <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-opacity-10 mb-3 rounded-circle mx-auto" 
+           style="width: 60px; height: 60px; background-color: rgba(78, 84, 200, 0.1); color: #4e54c8;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+        </svg>
+      </div>
+      <h3 class="fw-bold mb-3" style="color: #333;">Поиск по API</h3>
+      <p class="text-muted mb-4" style="font-size: 0.95rem;">
+        Найдите любую книгу по названию или автору благодаря интеграции с мировыми архивами.
+      </p>
+      <div class="mt-auto">
+        <a href="#" class="btn btn-outline-primary btn-sm rounded-pill px-4">Перейти к поиску &rarr;</a>
+      </div>
     </div>
-    <h3 class="fw-bold text-body-emphasis">Поиск по API</h3>
-    <p class="text-muted">Найдите любую книгу по названию или автору.</p>
   </div>
 
-  <div class="feature col">
-    <div
-      class="feature-icon bg-success bg-gradient text-white mb-3 rounded-circle mx-auto d-flex align-items-center justify-content-center"
-      style="width: 4.5rem; height: 4.5rem"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="currentColor"
-        class="bi bi-bookshelf"
-        viewBox="0 0 16 16"
-      >
-        <path
-          d="M2.5 0a.5.5 0 0 1 .5.5V2h10V.5a.5.5 0 0 1 1 0v15a.5.5 0 0 1-1 0V15H3v.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5M3 14h10v-3H3zm0-4h10V7H3zm0-4h10V3H3z"
-        />
-      </svg>
+  <!-- Карточка 2: Полка -->
+  <div class="col">
+    <div class="card h-100 border-0 shadow-sm p-4 text-center" style="background-color: #ffffff; border-radius: 20px;">
+      <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-opacity-10 mb-3 rounded-circle mx-auto" 
+           style="width: 60px; height: 60px; background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-bookshelf" viewBox="0 0 16 16">
+          <path d="M2.5 0a.5.5 0 0 1 .5.5V2h10V.5a.5.5 0 0 1 1 0v15a.5.5 0 0 1-1 0V15H3v.5a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5M3 14h10v-3H3zm0-4h10V7H3zm0-4h10V3H3z"/>
+        </svg>
+      </div>
+      <h3 class="fw-bold mb-3" style="color: #333;">Своя полка</h3>
+      <p class="text-muted mb-4" style="font-size: 0.95rem;">
+        Сохраняйте понравившиеся экземпляры в личную коллекцию и организуйте свою библиотеку.
+      </p>
+      <div class="mt-auto">
+        <a href="#" class="btn btn-outline-success btn-sm rounded-pill px-4">Открыть полку &rarr;</a>
+      </div>
     </div>
-    <h3 class="fw-bold text-body-emphasis">Своя полка</h3>
-    <p class="text-muted">
-      Сохраняйте понравившиеся экземпляры в личную коллекцию
-    </p>
   </div>
 
-  <div class="feature col">
-    <div
-      class="feature-icon bg-info bg-gradient text-white mb-3 rounded-circle mx-auto d-flex align-items-center justify-content-center"
-      style="width: 4.5rem; height: 4.5rem"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        fill="currentColor"
-        class="bi bi-person-bounding-box"
-        viewBox="0 0 16 16"
-      >
-        <path
-          d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1zM11 0.5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5M.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5"
-        />
-        <path
-          d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0"
-        />
-      </svg>
+  <!-- Карточка 3: Профиль -->
+  <div class="col">
+    <div class="card h-100 border-0 shadow-sm p-4 text-center" style="background-color: #ffffff; border-radius: 20px;">
+      <div class="feature-icon d-inline-flex align-items-center justify-content-center bg-opacity-10 mb-3 rounded-circle mx-auto" 
+           style="width: 60px; height: 60px; background-color: rgba(23, 162, 184, 0.1); color: #17a2b8;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-bounding-box" viewBox="0 0 16 16">
+          <path d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1zM11 0.5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5M.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5m15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5"/>
+          <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+        </svg>
+      </div>
+      <h3 class="fw-bold mb-3" style="color: #333;">Профиль</h3>
+      <p class="text-muted mb-4" style="font-size: 0.95rem;">
+        Персонализируйте свой аккаунт, управляйте настройками и следите за своей активностью.
+      </p>
+      <div class="mt-auto">
+        <a href="#" class="btn btn-outline-info btn-sm rounded-pill px-4">Перейти в профиль &rarr;</a>
+      </div>
     </div>
-    <h3 class="fw-bold text-body-emphasis">Профиль</h3>
-    <p class="text-muted">Персонализируйте свой аккаунт</p>
   </div>
+
 </div>
 {% endblock %}
