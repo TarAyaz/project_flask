@@ -18,6 +18,7 @@ from app.forms.user import EditProfileForm
 from app.utils.open_library_api import search_books
 from app.data import db_session
 from app.data.models import User, Book, SearchQuery
+from app.utils.recommendations import get_recommendations
 
 bp = Blueprint("main", __name__)
 
@@ -68,6 +69,7 @@ async def add_to_shelf():
         "title": request.form.get("title"),
         "author": request.form.get("author"),
         "isbn": request.form.get("isbn"),
+        "genre": request.form.get("subject"),
         "cover_url": request.form.get("cover_url"),
         "status": request.form.get("status"),
         "query": request.form.get("last_search_query"),
@@ -90,6 +92,7 @@ async def add_to_shelf():
                 title=data["title"],
                 author=data["author"],
                 isbn=data["isbn"],
+                genre=data["genre"],
                 cover_url=data["cover_url"],
                 status=data["status"],
                 user_id=current_user.id,
@@ -108,7 +111,20 @@ async def add_to_shelf():
 
 @bp.route("/")
 async def index():
-    return render_template("index.html", title="Добро пожаловать")
+    db_sess = db_session.create_session()
+
+    def get_data():
+        user_books = []
+        if current_user.is_authenticated:
+            user_books = (
+                db_sess.query(Book).filter(Book.user_id == current_user.id).all()
+            )
+        return get_recommendations(user_books)
+
+    recommendations = await sync_to_async(get_data)()
+    return render_template(
+        "index.html", title="Добро пожаловать", recommendations=recommendations
+    )
 
 
 @bp.route("/search", methods=["GET", "POST"])

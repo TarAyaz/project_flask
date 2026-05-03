@@ -15,6 +15,7 @@ def search_books(query):
                 "isbn": d.get("isbn", [None])[0],
                 "first_publish_year": d.get("first_publish_year"),
                 "key": d.get("key"),
+                "genre": d.get("subject", [None])[0],
                 "cover_url": f"https://covers.openlibrary.org/b/id/{d.get('cover_i')}-M.jpg"
                 if d.get("cover_i")
                 else None,

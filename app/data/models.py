@@ -44,6 +44,7 @@ class Book(SqlAlchemyBase):
     author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     isbn = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     language = sqlalchemy.Column(sqlalchemy.String, default="ru")
     cover_url = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     status = sqlalchemy.Column(sqlalchemy.String, default="Хочу прочитать")
