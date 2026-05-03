@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block content %}
 <div
   class="p-5 mb-4 text-white rounded-3 shadow-lg"
-  style="background-image: linear-gradient(rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.0)), url('{{ url_for('static', filename='new_background.png') }}'); 
+  style="background-image: linear-gradient(rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.0)), url('{{ url_for('static', filename='images/new_background.png') }}'); 
             background-size: cover; background-position: center; min-height: 450px; display: flex; align-items: center; border: none; font-family: 'Varela Round', !important"
 >
   <div class="container-fluid py-5 text-start w-100">
@@ -79,7 +79,7 @@
           />
           {% else %}
           <img
-            src="{{ url_for('static', filename='plug.png') }}"
+            src="{{ url_for('static', filename='images/plug.png') }}"
             class="card-img-top"
             style="height: 240px; object-fit: cover"
             alt="Нет обложки"

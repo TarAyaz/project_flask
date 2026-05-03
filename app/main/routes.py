@@ -29,7 +29,7 @@ def save_picture(form_picture):
     _, f = os.path.splitext(filename)
     picture_fn = rand_hex + f
     picture_path = os.path.join(
-        current_app.root_path, "static/profile_pics", picture_fn
+        current_app.root_path, "static/images/profile_pics", picture_fn
     )
     form_picture.save(picture_path)
     return picture_fn
@@ -55,7 +55,9 @@ async def profile():
         return redirect(url_for("main.profile"))
     elif request.method == "GET":
         form.username.data = current_user.username
-    avatar_path = url_for("static", filename="profile_pics/" + current_user.avatar_file)
+    avatar_path = url_for(
+        "static", filename="images/profile_pics/" + current_user.avatar_file
+    )
     return render_template(
         "profile.html", title="Профиль", form=form, avatar_path=avatar_path
     )

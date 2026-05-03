@@ -2,6 +2,6 @@ __pycache__/
 .env
 *.db
 instance/
-app/static/profile_pics/*
-!app/static/profile_pics/default_avatar.png
+app/static/images/profile_pics/*
+!app/static/images/profile_pics/default_avatar.png
 venv/
