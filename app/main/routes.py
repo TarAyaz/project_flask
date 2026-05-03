@@ -1,5 +1,7 @@
 import os
 import requests
+import uuid
+from werkzeug.utils import secure_filename
 from flask import (
     Blueprint,
     render_template,
@@ -20,7 +22,10 @@ bp = Blueprint("main", __name__)
 
 
 def save_picture(form_picture):
-    picture_fn = form_picture.filename
+    rand_hex = uuid.uuid4().hex
+    filename = secure_filename(form_picture.filename)
+    _, f = os.path.splitext(filename)
+    picture_fn = rand_hex + f
     picture_path = os.path.join(
         current_app.root_path, "static/profile_pics", picture_fn
     )
