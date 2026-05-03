@@ -6,23 +6,99 @@
       <p class="text-muted">Введите название или автора</p>
     </div>
 
-    <div class="card mb-5 shadow-sm border-0 bg-light">
+    <div class="card mb-5 shadow-sm border-0 bg-light rounded-4">
       <div class="card-body p-4">
-        <form action="" method="post" class="row g-3" novalidate>
+        <form action="" method="post" class="d-flex align-items-center gap-2" novalidate>
           {{ form.hidden_tag() }}
-          <div class="col-md-9">
-            {{ form.query(class="form-control form-control-lg",
-            placeholder="Например: Мастер и Маргарита...") }} {% for error in
-            form.query.errors %}
+
+          <div class="flex-grow-1 position-relative search-box">
+        
+            <span class="search-icon">
+              🔍
+            </span>
+
+            {{ form.query(
+              class="form-control form-control-lg rounded-pill ps-5 pe-5",
+              placeholder="Например: Potter",
+              id="searchInput"
+            ) }}
+
+            <span class="clear-icon" onclick="clearInput()">
+              ✖
+            </span>
+
+            {% for error in form.query.errors %}
             <div class="text-danger small mt-1">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="col-md-3 d-grid">
-            {{ form.submit(class="btn btn-primary btn-lg") }}
-          </div>
+
+          {{ form.submit(
+            class="btn btn-lg rounded-pill px-4",
+            style="background: linear-gradient(90deg, #5f63f2, #7b61ff); border: none; color: white;"
+          ) }}
         </form>
       </div>
     </div>
+
+    <style>
+      .search-box {
+        position: relative;
+      }
+
+      .search-box input {
+        padding-left: 45px !important;
+        padding-right: 45px !important;
+      }
+
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        font-size: 18px;
+        color: #888;
+      }
+
+      .clear-icon {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #888;
+        cursor: pointer;
+        display: block !important;
+      }
+
+
+      .clear-icon:hover {
+        color: #000;
+      }
+
+      .form-control {
+        border: 1px solid #dcdcdc;
+      }
+
+      .form-control:focus {
+        border-color: #7b61ff;
+        box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.2);
+      }
+    </style>
+
+    <script>
+      const input = document.getElementById('searchInput');
+      const clearBtn = document.querySelector('.clear-icon');
+
+      input.addEventListener('input', () => {
+        clearBtn.style.display = input.value ? 'block' : 'none';
+      });
+
+      function clearInput() {
+        input.value = '';
+        clearBtn.style.display = 'none';
+        input.focus();
+      }
+    </script>
 
     {% if books %}
     <div class="row row-cols-1 row-cols-md-2 g-4">
