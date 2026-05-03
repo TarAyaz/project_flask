@@ -3,12 +3,17 @@ from flask import current_app
 
 
 class CryptoManager:
-    @staticmethod
-    def get_cipher():
+    _cipher = None
+
+    @classmethod
+    def get_cipher(cls):
+        if cls._cipher:
+            return cls._cipher
         key = current_app.config.get("FERNET_KEY")
         if not key:
             raise ValueError("Ошибка: FERNET_KEY не установлен в .env или Config!")
-        return Fernet(key.encode())
+        cls._cipher = Fernet(key.encode())
+        return cls._cipher
 
     @classmethod
     def encrypt(cls, data: str) -> str:

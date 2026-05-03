@@ -17,8 +17,8 @@ class User(SqlAlchemyBase, UserMixin):
     avatar_file = sqlalchemy.Column(sqlalchemy.String, default="default_avatar.png")
     created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
-    books = orm.relationship("Book", back_populates="user")
-    searches = orm.relationship("SearchQuery", back_populates="user")
+    books = orm.relationship("Book", back_populates="user", lazy="subquery")
+    searches = orm.relationship("SearchQuery", back_populates="user", lazy="subquery")
 
     @property
     def password(self):

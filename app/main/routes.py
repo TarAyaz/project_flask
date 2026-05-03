@@ -1,6 +1,7 @@
 import os
 import requests
 import uuid
+from asgiref.sync import sync_to_async
 from werkzeug.utils import secure_filename
 from flask import (
     Blueprint,
@@ -35,16 +36,20 @@ def save_picture(form_picture):
 
 @bp.route("/profile", methods=["GET", "POST"])
 @login_required
-def profile():
+async def profile():
     form = EditProfileForm()
     db_sess = db_session.create_session()
     if form.validate_on_submit():
-        user = db_sess.query(User).filter(User.id == current_user.id).first()
-        if form.avatar.data:
-            picture_file = save_picture(form.avatar.data)
-            user.avatar_file = picture_file
-        user.username = form.username.data
-        db_sess.commit()
+
+        def update_user():
+            user = db_sess.query(User).filter(User.id == current_user.id).first()
+            if form.avatar.data:
+                picture_file = save_picture(form.avatar.data)
+                user.avatar_file = picture_file
+            user.username = form.username.data
+            db_sess.commit()
+
+        await sync_to_async(update_user)()
         flash("Профиль успешно обновлен!", "success")
         return redirect(url_for("main.profile"))
     elif request.method == "GET":
@@ -57,58 +62,73 @@ def profile():
 
 @bp.route("/add_to_shelf", methods=["POST"])
 @login_required
-def add_to_shelf():
+async def add_to_shelf():
     db_sess = db_session.create_session()
-    title = request.form.get("title")
-    author = request.form.get("author")
-    isbn = request.form.get("isbn")
-    cover_url = request.form.get("cover_url")
-    status = request.form.get("status")
-    query = request.form.get("last_search_query")
-    existing_book = (
-        db_sess.query(Book)
-        .filter(
-            Book.user_id == current_user.id, Book.title == title, Book.author == author
-        )
-        .first()
-    )
-    if existing_book:
-        flash(f"Книга '{title}' уже есть на полке!", "info")
-    else:
-        new_book = Book(
-            title=title,
-            author=author,
-            isbn=isbn,
-            cover_url=cover_url,
-            status=status,
-            user_id=current_user.id,
-        )
-        db_sess.add(new_book)
-        db_sess.commit()
-        flash(f"Книга '{title}' добавлена в раздел '{status}'!", "success")
+    data = {
+        "title": request.form.get("title"),
+        "author": request.form.get("author"),
+        "isbn": request.form.get("isbn"),
+        "cover_url": request.form.get("cover_url"),
+        "status": request.form.get("status"),
+        "query": request.form.get("last_search_query"),
+    }
 
-    return redirect(url_for("main.search", q=query))
+    def db_operation():
+        existing_book = (
+            db_sess.query(Book)
+            .filter(
+                Book.user_id == current_user.id,
+                Book.title == data["title"],
+                Book.author == data["author"],
+            )
+            .first()
+        )
+        if existing_book:
+            return f"Книга '{data['title']}' уже есть на полке!", "info"
+        else:
+            new_book = Book(
+                title=data["title"],
+                author=data["author"],
+                isbn=data["isbn"],
+                cover_url=data["cover_url"],
+                status=data["status"],
+                user_id=current_user.id,
+            )
+            db_sess.add(new_book)
+            db_sess.commit()
+            return (
+                f"Книга '{data['title']}' добавлена в раздел '{data['status']}'!",
+                "success",
+            )
+
+    msg, category = await sync_to_async(db_operation)()
+    flash(msg, category)
+    return redirect(url_for("main.search", q=data["query"]))
 
 
 @bp.route("/")
-def index():
+async def index():
     return render_template("index.html", title="Добро пожаловать")
 
 
 @bp.route("/search", methods=["GET", "POST"])
-def search():
+async def search():
     form = SearchForm()
     books = []
     recent_searches = []
     db_sess = db_session.create_session()
     if current_user.is_authenticated:
-        hist = (
-            db_sess.query(SearchQuery.query)
-            .filter(SearchQuery.user_id == current_user.id)
-            .order_by(SearchQuery.timestamp.desc())
-            .limit(10)
-            .all()
-        )
+
+        def get_history():
+            return (
+                db_sess.query(SearchQuery.query)
+                .filter(SearchQuery.user_id == current_user.id)
+                .order_by(SearchQuery.timestamp.desc())
+                .limit(10)
+                .all()
+            )
+
+        hist = await sync_to_async(get_history)()
         seen = set()
         for s in hist:
             if s[0] not in seen:
@@ -127,11 +147,15 @@ def search():
         current_query = query_from_url
 
     if current_query:
-        books = search_books(current_query)
+        books = await sync_to_async(search_books)(current_query)
         if current_user.is_authenticated:
-            search_entry = SearchQuery(query=current_query, user_id=current_user.id)
-            db_sess.add(search_entry)
-            db_sess.commit()
+
+            def save_search():
+                search_entry = SearchQuery(query=current_query, user_id=current_user.id)
+                db_sess.add(search_entry)
+                db_sess.commit()
+
+            await sync_to_async(save_search)()
 
     return render_template(
         "search.html",
@@ -144,9 +168,13 @@ def search():
 
 @bp.route("/my_shelf")
 @login_required
-def my_shelf():
+async def my_shelf():
     db_sess = db_session.create_session()
-    books = db_sess.query(Book).filter(Book.user_id == current_user.id).all()
+
+    def get_books():
+        return db_sess.query(Book).filter(Book.user_id == current_user.id).all()
+
+    books = await sync_to_async(get_books)()
     shelf = {
         "reading": [b for b in books if b.status == "Читаю"],
         "plan": [b for b in books if b.status == "Хочу прочитать"],
@@ -158,17 +186,22 @@ def my_shelf():
 
 @bp.route("/delete_book/<int:book_id>", methods=["POST"])
 @login_required
-def delete_book(book_id):
+async def delete_book(book_id):
     db_sess = db_session.create_session()
 
-    book = (
-        db_sess.query(Book)
-        .filter(Book.id == book_id, Book.user_id == current_user.id)
-        .first()
-    )
-    if book:
-        db_sess.delete(book)
-        db_sess.commit()
+    def do_delete():
+        book = (
+            db_sess.query(Book)
+            .filter(Book.id == book_id, Book.user_id == current_user.id)
+            .first()
+        )
+        if book:
+            db_sess.delete(book)
+            db_sess.commit()
+            return True
+        return False
+
+    if await sync_to_async(do_delete)():
         flash("Книга удалена с полки", "success")
     else:
         flash("Книга не найдена", "danger")
@@ -178,29 +211,41 @@ def delete_book(book_id):
 
 @bp.route("/update_book_status/<int:book_id>", methods=["POST"])
 @login_required
-def update_book_status(book_id):
+async def update_book_status(book_id):
     db_sess = db_session.create_session()
-    book = (
-        db_sess.query(Book)
-        .filter(Book.id == book_id, Book.user_id == current_user.id)
-        .first()
-    )
-
     new_status = request.form.get("status")
-    if book and new_status:
-        book.status = new_status
-        db_sess.commit()
-        flash(f"Статус книги '{book.title}' изменен", "success")
+
+    def do_update():
+        book = (
+            db_sess.query(Book)
+            .filter(Book.id == book_id, Book.user_id == current_user.id)
+            .first()
+        )
+        if book and new_status:
+            book.status = new_status
+            db_sess.commit()
+            return book.title
+        return None
+
+    title = await sync_to_async(do_update)()
+    if title:
+        flash(f"Статус книги '{title}' изменен", "success")
+    else:
+        flash("Ошибка обновления статуса", "danger")
 
     return redirect(url_for("main.my_shelf"))
 
 
 @bp.route("/book/<path:ol_id>")
-def book_details(ol_id):
+async def book_details(ol_id):
     search_query = request.args.get("q", "")
     url = f"https://openlibrary.org/{ol_id}.json"
-    response = requests.get(url)
-    data = response.json()
+
+    def fetch_data():
+        response = requests.get(url)
+        return response.json()
+
+    data = await sync_to_async(fetch_data)()
     description = data.get("description", "Описание отсутствует")
     if isinstance(description, dict):
         description = description.get("value")

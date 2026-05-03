@@ -2,9 +2,9 @@ import requests
 
 
 def search_books(query):
-    url = f"https://openlibrary.org/search.json?q={query}&limit=20"
+    url = f"https://openlibrary.org/search.json?q={query}&limit=50"
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
         result = []
