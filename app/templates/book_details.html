@@ -10,12 +10,11 @@
           alt="Обложка"
         />
         {% else %}
-        <div
-          class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
-          style="min-height: 400px"
-        >
-          <span>Нет обложки</span>
-        </div>
+        <img
+          src="{{ url_for('static', filename='plug.png') }}"
+          class="img-fluid rounded shadow"
+          alt="Обложка отсутствует"
+        />
         {% endif %}
       </div>
 
