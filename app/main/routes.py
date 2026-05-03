@@ -16,7 +16,7 @@ from app.forms.book import SearchForm
 from app.forms.user import EditProfileForm
 from app.utils.open_library_api import search_books
 from app.data import db_session
-from app.data.models import User, Book
+from app.data.models import User, Book, SearchQuery
 
 bp = Blueprint("main", __name__)
 
@@ -99,13 +99,47 @@ def index():
 def search():
     form = SearchForm()
     books = []
+    recent_searches = []
+    db_sess = db_session.create_session()
+    if current_user.is_authenticated:
+        hist = (
+            db_sess.query(SearchQuery.query)
+            .filter(SearchQuery.user_id == current_user.id)
+            .order_by(SearchQuery.timestamp.desc())
+            .limit(10)
+            .all()
+        )
+        seen = set()
+        for s in hist:
+            if s[0] not in seen:
+                recent_searches.append(s[0])
+                seen.add(s[0])
+            if len(recent_searches) >= 6:
+                break
+
     query_from_url = request.args.get("q")
+    current_query = None
+
     if form.validate_on_submit():
-        books = search_books(form.query.data)
+        current_query = form.query.data
     elif query_from_url:
         form.query.data = query_from_url
-        books = search_books(query_from_url)
-    return render_template("search.html", title="Поиск", form=form, books=books)
+        current_query = query_from_url
+
+    if current_query:
+        books = search_books(current_query)
+        if current_user.is_authenticated:
+            search_entry = SearchQuery(query=current_query, user_id=current_user.id)
+            db_sess.add(search_entry)
+            db_sess.commit()
+
+    return render_template(
+        "search.html",
+        title="Поиск",
+        form=form,
+        books=books,
+        recent_searches=recent_searches,
+    )
 
 
 @bp.route("/my_shelf")

@@ -8,35 +8,51 @@
 
     <div class="card mb-5 shadow-sm border-0 bg-light rounded-4">
       <div class="card-body p-4">
-        <form action="" method="post" class="d-flex align-items-center gap-2" novalidate>
+        <form
+          action=""
+          method="post"
+          class="d-flex align-items-center gap-2"
+          novalidate
+        >
           {{ form.hidden_tag() }}
 
           <div class="flex-grow-1 position-relative search-box">
-        
-            <span class="search-icon">
-              🔍
-            </span>
+            <span class="search-icon"> 🔍 </span>
 
-            {{ form.query(
-              class="form-control form-control-lg rounded-pill ps-5 pe-5",
-              placeholder="Например: Potter",
-              id="searchInput"
-            ) }}
+            {{ form.query( class="form-control form-control-lg rounded-pill ps-5
+            pe-5", placeholder="Например: Potter", id="searchInput" ) }}
 
-            <span class="clear-icon" onclick="clearInput()">
-              ✖
-            </span>
+            <span class="clear-icon" onclick="clearInput()"> ✖ </span>
 
             {% for error in form.query.errors %}
             <div class="text-danger small mt-1">{{ error }}</div>
             {% endfor %}
           </div>
 
-          {{ form.submit(
-            class="btn btn-lg rounded-pill px-4",
-            style="background: linear-gradient(90deg, #5f63f2, #7b61ff); border: none; color: white;"
-          ) }}
+          {{ form.submit( class="btn btn-lg rounded-pill px-4",
+          style="background: linear-gradient(90deg, #5f63f2, #7b61ff); border:
+          none; color: white;" ) }}
         </form>
+        {% if recent_searches %}
+        <div class="mt-3">
+          <small class="text-muted me-2">Недавние поиски:</small>
+          <div class="d-flex flex-wrap gap-2 d-inline-block">
+            {% for s_query in recent_searches %}
+            <a
+              href="{{ url_for('main.search', q=s_query) }}"
+              class="badge rounded-pill text-decoration-none px-3 py-2"
+              style="
+                background-color: rgba(123, 97, 255, 0.1);
+                color: #7b61ff;
+                border: 1px solid rgba(123, 97, 255, 0.2);
+              "
+            >
+              {{ s_query }}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
 
@@ -70,7 +86,6 @@
         display: block !important;
       }
 
-
       .clear-icon:hover {
         color: #000;
       }
@@ -86,16 +101,16 @@
     </style>
 
     <script>
-      const input = document.getElementById('searchInput');
-      const clearBtn = document.querySelector('.clear-icon');
+      const input = document.getElementById("searchInput");
+      const clearBtn = document.querySelector(".clear-icon");
 
-      input.addEventListener('input', () => {
-        clearBtn.style.display = input.value ? 'block' : 'none';
+      input.addEventListener("input", () => {
+        clearBtn.style.display = input.value ? "block" : "none";
       });
 
       function clearInput() {
-        input.value = '';
-        clearBtn.style.display = 'none';
+        input.value = "";
+        clearBtn.style.display = "none";
         input.focus();
       }
     </script>
