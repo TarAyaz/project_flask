@@ -1,0 +1,80 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg" style="border-radius: 20px">
+        <div
+          class="card-header text-white text-center py-4"
+          style="
+            border-radius: 20px 20px 0 0;
+            background: linear-gradient(135deg, #391fb8, #8b5cf6);
+          "
+        >
+          <h2 class="mb-0 fw-bold">
+            <i class="bi bi-pen-fill me-2"></i>Написать книгу
+          </h2>
+          <p class="mb-0 text-white-50">Ваша история начинается здесь</p>
+        </div>
+
+        <div class="card-body p-5">
+          <form method="POST" action="" , enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-4">
+              {{ form.title.label(class="form-label fw-bold text-muted") }} {{
+              form.title(class="form-control form-control-lg bg-light",
+              style="border-radius: 15px; border: 1px solid #e0e7ff;") }} {% for
+              error in form.title.errors %}
+              <div class="text-danger mt-1 small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              {{ form.cover.label(class="form-label fw-bold text-muted") }} {{
+              form.cover(class="form-control bg-light", style="border-radius:
+              15px;") }}
+              <div class="form-text">Рекомендуемый размер: 400x600px</div>
+              {% for error in form.cover.errors %}
+              <div class="text-danger mt-1 small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              {{ form.description.label(class="form-label fw-bold text-muted")
+              }} {{ form.description(class="form-control bg-light", rows="3",
+              style="border-radius: 15px; border: 1px solid #e0e7ff;") }}
+              <div class="form-text">
+                Короткая аннотация (о чем ваша книга).
+              </div>
+              {% for error in form.description.errors %}
+              <div class="text-danger mt-1 small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-5">
+              {{ form.content.label(class="form-label fw-bold text-muted") }} {{
+              form.content(class="form-control bg-light", rows="15",
+              style="border-radius: 15px; border: 1px solid #e0e7ff;") }} {% for
+              error in form.content.errors %}
+              <div class="text-danger mt-1 small">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="d-grid gap-2">
+              {{ form.submit(class="btn btn-lg shadow-sm text-white",
+              style="background: linear-gradient(135deg, #391fb8, #8b5cf6);
+              border-radius: 15px; border: none;") }}
+              <a
+                href="{{ url_for('main.my_shelf') }}"
+                class="btn btn-light btn-lg text-muted"
+                style="border-radius: 15px"
+                >Отмена</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

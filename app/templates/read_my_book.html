@@ -1,0 +1,71 @@
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <a
+      href="{{ url_for('main.my_shelf') }}"
+      class="text-decoration-none"
+      style="color: #8b5cf6; font-weight: 500"
+    >
+      <i class="bi bi-arrow-left me-1"></i> Вернуться на полку
+    </a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="text-center mb-5">
+        <span
+          class="badge rounded-pill mb-3"
+          style="
+            background-color: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+            padding: 8px 15px;
+          "
+        >
+          Авторское произведение
+        </span>
+        <h1 class="display-4 fw-bold" style="color: #2c3e50">
+          {{ book.title }}
+        </h1>
+        <p class="text-muted fs-5 mt-2">Автор: {{ book.author }}</p>
+
+        {% if book.description %}
+        <div
+          class="mt-4 p-4 mx-auto bg-light text-muted fst-italic"
+          style="border-radius: 20px; max-width: 80%"
+        >
+          "{{ book.description }}"
+        </div>
+        {% endif %}
+      </div>
+      <div
+        class="card border-0 shadow-sm"
+        style="border-radius: 20px; background-color: #faf9f6"
+      >
+        <div class="card-body p-4 p-md-5">
+          <div
+            class="book-content"
+            style="
+              font-family: 'Georgia', serif;
+              font-size: 1.2rem;
+              line-height: 1.8;
+              color: #333;
+              white-space: pre-wrap;
+            "
+          >
+            {{ book.content }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 768px) {
+    .book-content {
+      font-size: 1.1rem !important;
+      line-height: 1.6 !important;
+    }
+  }
+</style>
+{% endblock %}

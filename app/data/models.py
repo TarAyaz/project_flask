@@ -43,6 +43,8 @@ class Book(SqlAlchemyBase):
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     author = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    content = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
+    is_custom = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     isbn = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     genre = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     language = sqlalchemy.Column(sqlalchemy.String, default="ru")

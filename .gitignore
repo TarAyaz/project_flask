@@ -5,3 +5,4 @@ instance/
 app/static/images/profile_pics/*
 !app/static/images/profile_pics/default_avatar.png
 venv/
+app/static/images/book_covers/*

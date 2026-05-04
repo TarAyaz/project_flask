@@ -13,7 +13,7 @@ from flask import (
     current_app,
 )
 from flask_login import login_required, current_user
-from app.forms.book import SearchForm
+from app.forms.book import SearchForm, CreateBookForm
 from app.forms.user import EditProfileForm
 from app.utils.open_library_api import search_books
 from app.data import db_session
@@ -33,6 +33,18 @@ def save_picture(form_picture):
     )
     form_picture.save(picture_path)
     return picture_fn
+
+
+def save_book_cover(form_picture):
+    rand_hex = uuid.uuid4().hex
+    _, f = os.path.splitext(form_picture.filename)
+    picture_fn = rand_hex + f
+    upload_path = os.path.join(current_app.root_path, "static/images/book_covers")
+    if not os.path.exists(upload_path):
+        os.makedirs(upload_path)
+    picture_path = os.path.join(upload_path, picture_fn)
+    form_picture.save(picture_path)
+    return url_for("static", filename="images/book_covers/" + picture_fn)
 
 
 @bp.route("/profile", methods=["GET", "POST"])
@@ -197,6 +209,7 @@ async def my_shelf():
         "reading": [b for b in books if b.status == "Читаю"],
         "plan": [b for b in books if b.status == "Хочу прочитать"],
         "completed": [b for b in books if b.status == "Прочитано"],
+        "custom": [b for b in books if b.is_custom],
     }
 
     return render_template("my_shelf.html", title="Моя полка", shelf=shelf)
@@ -286,3 +299,53 @@ async def book_details(ol_id):
         cover_url=cover_url,
         search_query=search_query,
     )
+
+
+@bp.route("/create_book", methods=["GET", "POST"])
+@login_required
+async def create_book():
+    form = CreateBookForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        cover_url = None
+        if form.cover.data:
+            cover_url = await sync_to_async(save_book_cover)(form.cover.data)
+        new_book = Book(
+            title=form.title.data,
+            description=form.description.data,
+            content=form.content.data,
+            author=current_user.username,
+            cover_url=cover_url,
+            status="Собственная книга",
+            is_custom=True,
+            user_id=current_user.id,
+        )
+
+        def save():
+            db_sess.add(new_book)
+            db_sess.commit()
+
+        await sync_to_async(save)()
+        flash("Книга успешно создана!", "success")
+        return redirect(url_for("main.my_shelf"))
+
+    return render_template("create_book.html", form=form)
+
+
+@bp.route("/read_my_book/<int:book_id>")
+@login_required
+async def read_my_book(book_id):
+    db_sess = db_session.create_session()
+
+    def get_book():
+        return (
+            db_sess.query(Book)
+            .filter(Book.id == book_id, Book.user_id == current_user.id)
+            .first()
+        )
+
+    book = await sync_to_async(get_book)()
+    if not book or not book.is_custom:
+        flash("Книга не найдена", "danger")
+        return redirect(url_for("main.my_shelf"))
+    return render_template("read_my_book.html", book=book)

@@ -2,74 +2,46 @@
 <div class="container">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="display-6 fw-bold text-primary">Моя книжная полка</h1>
-    <a
-      href="{{ url_for('main.search') }}"
-      class="btn btn-outline-primary btn-sm"
-    >
-      <i class="bi bi-plus-lg"></i> Найти новую книгу
-    </a>
+    <div>
+      <a href="{{ url_for('main.create_book') }}" class="btn btn-primary btn-sm me-2 shadow-sm">
+        <i class="bi bi-pen"></i> Написать книгу
+      </a>
+      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm shadow-sm">
+        <i class="bi bi-plus-lg"></i> Найти новую книгу
+      </a>
+    </div>
   </div>
 
-  <ul
-    class="nav nav-pills mb-4 justify-content-center"
-    id="pills-tab"
-    role="tablist"
-  >
+  <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link active"
-        id="pills-reading-tab"
-        data-bs-toggle="pill"
-        data-bs-target="#pills-reading"
-        type="button"
-        role="tab"
-      >
+      <button class="nav-link active" id="pills-reading-tab" data-bs-toggle="pill" data-bs-target="#pills-reading" type="button" role="tab">
         Читаю
-        <span class="badge bg-light text-primary ms-1"
-          >{{ shelf.reading|length }}</span
-        >
+        <span class="badge bg-light text-primary ms-1">{{ shelf.reading|length }}</span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        id="pills-plan-tab"
-        data-bs-toggle="pill"
-        data-bs-target="#pills-plan"
-        type="button"
-        role="tab"
-      >
+      <button class="nav-link" id="pills-plan-tab" data-bs-toggle="pill" data-bs-target="#pills-plan" type="button" role="tab">
         В планах
-        <span class="badge bg-light text-primary ms-1"
-          >{{ shelf.plan|length }}</span
-        >
+        <span class="badge bg-light text-primary ms-1">{{ shelf.plan|length }}</span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
-      <button
-        class="nav-link"
-        id="pills-completed-tab"
-        data-bs-toggle="pill"
-        data-bs-target="#pills-completed"
-        type="button"
-        role="tab"
-      >
+      <button class="nav-link" id="pills-completed-tab" data-bs-toggle="pill" data-bs-target="#pills-completed" type="button" role="tab">
         Прочитано
-        <span class="badge bg-light text-primary ms-1"
-          >{{ shelf.completed|length }}</span
-        >
+        <span class="badge bg-light text-primary ms-1">{{ shelf.completed|length }}</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-custom-tab" data-bs-toggle="pill" data-bs-target="#pills-custom" type="button" role="tab">
+        Мои произведения
+        <span class="badge bg-light text-primary ms-1">{{ shelf.custom|length }}</span>
       </button>
     </li>
   </ul>
 
   <div class="tab-content" id="pills-tabContent">
-    {% for category, books in [('reading', shelf.reading), ('plan', shelf.plan),
-    ('completed', shelf.completed)] %}
-    <div
-      class="tab-pane fade {% if category == 'reading' %}show active{% endif %}"
-      id="pills-{{ category }}"
-      role="tabpanel"
-    >
+    {% for category, books in [('reading', shelf.reading), ('plan', shelf.plan), ('completed', shelf.completed), ('custom', shelf.custom)] %}
+    <div class="tab-pane fade {% if category == 'reading' %}show active{% endif %}" id="pills-{{ category }}" role="tabpanel">
       {% if books %}
       <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-4">
         {% for book in books %}
@@ -90,19 +62,30 @@
               </p>
         
               <div class="mt-auto">
-                <form action="{{ url_for('main.update_book_status', book_id=book.id) }}" method="post" class="mb-1">
-                  <select name="status" class="form-select form-select-sm mb-1" onchange="this.form.submit()">
-                    <option value="Хочу прочитать" {% if book.status == 'Хочу прочитать' %}selected{% endif %}>В планы</option>
-                    <option value="Читаю" {% if book.status == 'Читаю' %}selected{% endif %}>Читаю</option>
-                    <option value="Прочитано" {% if book.status == 'Прочитано' %}selected{% endif %}>Прочитано</option>
-                  </select>
-                </form>
-        
-                <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Удалить книгу?')">
-                  <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none" style="text-decoration: none; font-size: 0.8rem;">
-                    Удалить
-                  </button>
-                </form>
+                {% if category == 'custom' %}
+                  <a href="{{ url_for('main.read_my_book', book_id=book.id) }}" class="btn btn-sm btn-primary w-100 mb-2" style="border-radius: 10px;">
+                    <i class="bi bi-book"></i> Читать
+                  </a>
+                  <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Точно удалить ваше произведение?')">
+                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none w-100" style="text-decoration: none; font-size: 0.8rem;">
+                      Удалить
+                    </button>
+                  </form>
+                {% else %}
+                  <form action="{{ url_for('main.update_book_status', book_id=book.id) }}" method="post" class="mb-1">
+                    <select name="status" class="form-select form-select-sm mb-1" onchange="this.form.submit()">
+                      <option value="Хочу прочитать" {% if book.status == 'Хочу прочитать' %}selected{% endif %}>В планы</option>
+                      <option value="Читаю" {% if book.status == 'Читаю' %}selected{% endif %}>Читаю</option>
+                      <option value="Прочитано" {% if book.status == 'Прочитано' %}selected{% endif %}>Прочитано</option>
+                    </select>
+                  </form>
+          
+                  <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Удалить книгу?')">
+                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none w-100" style="text-decoration: none; font-size: 0.8rem;">
+                      Удалить
+                    </button>
+                  </form>
+                {% endif %}
               </div>
             </div>
           </div>
