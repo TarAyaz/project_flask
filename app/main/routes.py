@@ -47,6 +47,22 @@ def save_book_cover(form_picture):
     return url_for("static", filename="images/book_covers/" + picture_fn)
 
 
+def delete_file_safe(file_url, folder):
+    if not file_url:
+        return
+    filename = file_url.split("/")[-1]
+    if file_url.startswith("http") or filename == "plug.png":
+        return
+
+    file_path = os.path.join(current_app.root_path, "static/images", folder, filename)
+
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f"Ошибка при удалении файла {filename}: {e}")
+
+
 @bp.route("/profile", methods=["GET", "POST"])
 @login_required
 async def profile():
@@ -57,6 +73,16 @@ async def profile():
         def update_user():
             user = db_sess.query(User).filter(User.id == current_user.id).first()
             if form.avatar.data:
+                old_avatar = user.avatar_file
+                if old_avatar and old_avatar != "default_avatar.png":
+                    old_path = os.path.join(
+                        current_app.root_path, "static/images/profile_pics", old_avatar
+                    )
+                    if os.path.exists(old_path):
+                        try:
+                            os.remove(old_path)
+                        except Exception as e:
+                            print(f"Ошибка при удалении старого аватара: {e}")
                 picture_file = save_picture(form.avatar.data)
                 user.avatar_file = picture_file
             user.username = form.username.data
@@ -180,12 +206,26 @@ async def search():
         books = await sync_to_async(search_books)(current_query)
         if current_user.is_authenticated:
 
-            def save_search():
+            def save_search_and_cleanup():
                 search_entry = SearchQuery(query=current_query, user_id=current_user.id)
                 db_sess.add(search_entry)
                 db_sess.commit()
+                MAX_HISTORY = 10
+                old_queries = (
+                    db_sess.query(SearchQuery.id)
+                    .filter(SearchQuery.user_id == current_user.id)
+                    .order_by(SearchQuery.timestamp.desc())
+                    .offset(MAX_HISTORY)
+                    .all()
+                )
+                if old_queries:
+                    ids_to_delete = [q.id for q in old_queries]
+                    db_sess.query(SearchQuery).filter(
+                        SearchQuery.id.in_(ids_to_delete)
+                    ).delete(synchronize_session=False)
+                    db_sess.commit()
 
-            await sync_to_async(save_search)()
+            await sync_to_async(save_search_and_cleanup)()
 
     return render_template(
         "search.html",
@@ -227,6 +267,8 @@ async def delete_book(book_id):
             .first()
         )
         if book:
+            if book.is_custom:
+                delete_file_safe(book.cover_url, "book_covers")
             db_sess.delete(book)
             db_sess.commit()
             return True
@@ -349,3 +391,49 @@ async def read_my_book(book_id):
         flash("Книга не найдена", "danger")
         return redirect(url_for("main.my_shelf"))
     return render_template("read_my_book.html", book=book)
+
+
+@bp.route("/edit_book/<int:book_id>", methods=["GET", "POST"])
+@login_required
+async def edit_book(book_id):
+    db_sess = db_session.create_session()
+
+    def get_book():
+        return (
+            db_sess.query(Book)
+            .filter(
+                Book.id == book_id,
+                Book.user_id == current_user.id,
+                Book.is_custom == True,
+            )
+            .first()
+        )
+
+    book = await sync_to_async(get_book)()
+    if not book:
+        flash("Книга не найдена или её нельзя редактировать", "danger")
+        return redirect(url_for("main.my_shelf"))
+    form = CreateBookForm()
+    if form.validate_on_submit():
+
+        def update_logic():
+            book.title = form.title.data
+            book.description = form.description.data
+            book.content = form.content.data
+            if form.cover.data:
+                delete_file_safe(book.cover_url, "book_covers")
+                book.cover_url = save_book_cover(form.cover.data)
+
+            db_sess.commit()
+
+        await sync_to_async(update_logic)()
+        flash("Изменения сохранены!", "success")
+        return redirect(url_for("main.my_shelf"))
+    elif request.method == "GET":
+        form.title.data = book.title
+        form.description.data = book.description
+        form.content.data = book.content
+
+    return render_template(
+        "create_book.html", form=form, title="Редактирование", is_edit=True, book=book
+    )

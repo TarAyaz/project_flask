@@ -11,13 +11,19 @@
           "
         >
           <h2 class="mb-0 fw-bold">
-            <i class="bi bi-pen-fill me-2"></i>Написать книгу
+            <i
+              class="bi {{ 'bi-pencil-square' if is_edit else 'bi-pen-fill' }} me-2"
+            ></i>
+            {{ 'Редактировать книгу' if is_edit else 'Написать книгу' }}
           </h2>
-          <p class="mb-0 text-white-50">Ваша история начинается здесь</p>
+          <p class="mb-0 text-white-50">
+            {{ 'Внесите правки в свое произведение' if is_edit else 'Ваша
+            история начинается здесь' }}
+          </p>
         </div>
 
         <div class="card-body p-5">
-          <form method="POST" action="" , enctype="multipart/form-data">
+          <form method="POST" action="" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
 
             <div class="mb-4">
@@ -33,7 +39,11 @@
               {{ form.cover.label(class="form-label fw-bold text-muted") }} {{
               form.cover(class="form-control bg-light", style="border-radius:
               15px;") }}
-              <div class="form-text">Рекомендуемый размер: 400x600px</div>
+              <div class="form-text">
+                {% if is_edit and book.cover_url %} Текущая обложка сохранена.
+                Загрузите новую, чтобы изменить её. {% else %} Рекомендуемый
+                размер: 400x600px {% endif %}
+              </div>
               {% for error in form.cover.errors %}
               <div class="text-danger mt-1 small">{{ error }}</div>
               {% endfor %}
@@ -62,6 +72,7 @@
 
             <div class="d-grid gap-2">
               {{ form.submit(class="btn btn-lg shadow-sm text-white",
+              value="Сохранить изменения" if is_edit else "Опубликовать книгу",
               style="background: linear-gradient(135deg, #391fb8, #8b5cf6);
               border-radius: 15px; border: none;") }}
               <a

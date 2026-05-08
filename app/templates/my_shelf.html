@@ -63,9 +63,14 @@
         
               <div class="mt-auto">
                 {% if category == 'custom' %}
-                  <a href="{{ url_for('main.read_my_book', book_id=book.id) }}" class="btn btn-sm btn-primary w-100 mb-2" style="border-radius: 10px;">
-                    <i class="bi bi-book"></i> Читать
-                  </a>
+                  <div class="d-flex gap-1 mb-2">
+                    <a href="{{ url_for('main.read_my_book', book_id=book.id) }}" class="btn btn-sm btn-primary flex-grow-1" style="border-radius: 10px;">
+                      <i class="bi bi-book"></i>
+                    </a>
+                    <a href="{{ url_for('main.edit_book', book_id=book.id) }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 10px;" title="Редактировать">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                  </div>
                   <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Точно удалить ваше произведение?')">
                     <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none w-100" style="text-decoration: none; font-size: 0.8rem;">
                       Удалить
