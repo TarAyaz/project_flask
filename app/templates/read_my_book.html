@@ -1,71 +1,418 @@
-{% extends "base.html" %} {% block content %}
-<div class="container py-4">
-  <div class="mb-4">
-    <a
-      href="{{ url_for('main.my_shelf') }}"
-      class="text-decoration-none"
-      style="color: #8b5cf6; font-weight: 500"
-    >
-      <i class="bi bi-arrow-left me-1"></i> Вернуться на полку
-    </a>
-  </div>
+{% extends "base.html" %}
 
-  <div class="row justify-content-center">
-    <div class="col-lg-9">
-      <div class="text-center mb-5">
-        <span
-          class="badge rounded-pill mb-3"
-          style="
-            background-color: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
-            padding: 8px 15px;
-          "
-        >
-          Авторское произведение
-        </span>
-        <h1 class="display-4 fw-bold" style="color: #2c3e50">
-          {{ book.title }}
-        </h1>
-        <p class="text-muted fs-5 mt-2">Автор: {{ book.author }}</p>
+{% block content %}
 
-        {% if book.description %}
-        <div
-          class="mt-4 p-4 mx-auto bg-light text-muted fst-italic"
-          style="border-radius: 20px; max-width: 80%"
-        >
-          "{{ book.description }}"
-        </div>
-        {% endif %}
-      </div>
-      <div
-        class="card border-0 shadow-sm"
-        style="border-radius: 20px; background-color: #faf9f6"
-      >
-        <div class="card-body p-4 p-md-5">
-          <div
-            class="book-content"
-            style="
-              font-family: 'Georgia', serif;
-              font-size: 1.2rem;
-              line-height: 1.8;
-              color: #333;
-              white-space: pre-wrap;
-            "
-          >
-            {{ book.content }}
-          </div>
-        </div>
-      </div>
+<div class="reader-page">
+
+  <!-- BACKGROUND GLOW -->
+
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <div class="container py-5">
+
+    <!-- BACK BUTTON -->
+
+    <div class="mb-5">
+
+      <a href="{{ url_for('main.my_shelf') }}"
+         class="back-btn">
+
+        <i class="bi bi-arrow-left"></i>
+
+        Вернуться на полку
+
+      </a>
+
     </div>
+
+    <!-- HEADER -->
+
+    <div class="row justify-content-center">
+
+      <div class="col-xl-9">
+
+        <div class="reader-header">
+
+          <div class="reader-badge">
+
+            <i class="bi bi-stars"></i>
+
+            Авторское произведение
+
+          </div>
+
+          <h1 class="reader-title">
+
+            {{ book.title }}
+
+          </h1>
+
+          <div class="reader-author">
+
+            <i class="bi bi-feather"></i>
+
+            {{ book.author }}
+
+          </div>
+
+          {% if book.description %}
+
+          <div class="description-box">
+
+            <div class="quote-icon">
+              <i class="bi bi-quote"></i>
+            </div>
+
+            <p>
+              {{ book.description }}
+            </p>
+
+          </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- BOOK -->
+
+    <div class="row justify-content-center">
+
+      <div class="col-xl-9">
+
+        <div class="book-container">
+
+          <!-- TOP DECOR -->
+
+          <div class="book-top-line"></div>
+
+          <!-- CONTENT -->
+
+          <div class="book-content">
+
+            {{ book.content }}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
   </div>
+
 </div>
 
 <style>
-  @media (max-width: 768px) {
-    .book-content {
-      font-size: 1.1rem !important;
-      line-height: 1.6 !important;
-    }
+
+/* ===== BODY ===== */
+
+body {
+  background:
+    radial-gradient(circle at top left, #8b5cf6 0%, #140b22 40%),
+    radial-gradient(circle at bottom right, #5b21b6 0%, transparent 35%),
+    #0f0717;
+
+  min-height: 100vh;
+
+  overflow-x: hidden;
+}
+
+/* ===== BACKGROUND GLOWS ===== */
+
+.bg-glow {
+  position: fixed;
+
+  border-radius: 50%;
+
+  filter: blur(120px);
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+.glow-1 {
+  width: 350px;
+  height: 350px;
+
+  top: -100px;
+  left: -100px;
+
+  background:
+    rgba(139,92,246,0.22);
+}
+
+.glow-2 {
+  width: 300px;
+  height: 300px;
+
+  bottom: -100px;
+  right: -100px;
+
+  background:
+    rgba(91,33,182,0.2);
+}
+
+/* ===== BACK BUTTON ===== */
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  text-decoration: none;
+
+  padding: 12px 22px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: #d8b4fe;
+
+  backdrop-filter: blur(12px);
+
+  transition: 0.35s;
+}
+
+.back-btn:hover {
+  transform: translateX(-3px);
+
+  color: white;
+
+  background:
+    rgba(255,255,255,0.1);
+}
+
+/* ===== HEADER ===== */
+
+.reader-header {
+  position: relative;
+
+  z-index: 2;
+
+  text-align: center;
+
+  margin-bottom: 60px;
+}
+
+/* ===== BADGE ===== */
+
+.reader-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 24px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.07);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: #d8b4fe;
+
+  backdrop-filter: blur(12px);
+
+  margin-bottom: 28px;
+
+  font-weight: 500;
+}
+
+/* ===== TITLE ===== */
+
+.reader-title {
+  font-size: clamp(3rem, 8vw, 5.5rem);
+
+  font-weight: 900;
+
+  line-height: 1.05;
+
+  margin-bottom: 22px;
+
+  background:
+    linear-gradient(to right, white, #d8b4fe);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== AUTHOR ===== */
+
+.reader-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  color: rgba(255,255,255,0.72);
+
+  font-size: 1.1rem;
+
+  margin-bottom: 40px;
+}
+
+/* ===== DESCRIPTION ===== */
+
+.description-box {
+  position: relative;
+
+  max-width: 760px;
+
+  margin: auto;
+
+  padding: 35px;
+
+  border-radius: 30px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(18px);
+
+  color: rgba(255,255,255,0.82);
+
+  font-size: 1.08rem;
+
+  line-height: 1.9;
+
+  font-style: italic;
+
+  box-shadow:
+    0 15px 50px rgba(0,0,0,0.25);
+}
+
+.quote-icon {
+  font-size: 2rem;
+
+  color: rgba(216,180,254,0.35);
+
+  margin-bottom: 18px;
+}
+
+/* ===== BOOK CONTAINER ===== */
+
+.book-container {
+  position: relative;
+
+  z-index: 2;
+
+  overflow: hidden;
+
+  border-radius: 36px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(22px);
+
+  padding: 55px;
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,0.35);
+}
+
+/* ===== TOP LINE ===== */
+
+.book-top-line {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  background:
+    linear-gradient(to right,
+      #8b5cf6,
+      #c084fc,
+      #8b5cf6);
+}
+
+/* ===== CONTENT ===== */
+
+.book-content {
+  color: rgba(255,255,255,0.9);
+
+  font-family: "Georgia", serif;
+
+  font-size: 1.22rem;
+
+  line-height: 2.15;
+
+  white-space: pre-wrap;
+
+  letter-spacing: 0.2px;
+}
+
+/* ===== FIRST LETTER ===== */
+
+.book-content::first-letter {
+  font-size: 4rem;
+
+  line-height: 1;
+
+  float: left;
+
+  margin-right: 12px;
+
+  font-weight: bold;
+
+  color: #d8b4fe;
+}
+
+/* ===== PARAGRAPH SPACING ===== */
+
+.book-content p {
+  margin-bottom: 2rem;
+}
+
+/* ===== MOBILE ===== */
+
+@media (max-width: 768px) {
+
+  .reader-title {
+    font-size: 3rem;
   }
+
+  .book-container {
+    padding: 30px 22px;
+  }
+
+  .description-box {
+    padding: 24px;
+  }
+
+  .book-content {
+    font-size: 1.05rem;
+    line-height: 1.9;
+  }
+
+  .book-content::first-letter {
+    font-size: 3rem;
+  }
+
+}
+
 </style>
+
 {% endblock %}

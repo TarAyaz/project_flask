@@ -1,91 +1,553 @@
-{% extends "base.html" %} {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-lg" style="border-radius: 20px">
-        <div
-          class="card-header text-white text-center py-4"
-          style="
-            border-radius: 20px 20px 0 0;
-            background: linear-gradient(135deg, #391fb8, #8b5cf6);
-          "
-        >
-          <h2 class="mb-0 fw-bold">
-            <i
-              class="bi {{ 'bi-pencil-square' if is_edit else 'bi-pen-fill' }} me-2"
-            ></i>
-            {{ 'Редактировать книгу' if is_edit else 'Написать книгу' }}
-          </h2>
-          <p class="mb-0 text-white-50">
-            {{ 'Внесите правки в свое произведение' if is_edit else 'Ваша
-            история начинается здесь' }}
-          </p>
-        </div>
+{% extends "base.html" %}
 
-        <div class="card-body p-5">
-          <form method="POST" action="" enctype="multipart/form-data">
+{% block content %}
+
+<div class="write-page">
+
+  <div class="container py-5">
+
+    <div class="row justify-content-center">
+
+      <div class="col-xl-8 col-lg-9">
+
+        <div class="editor-card">
+
+
+          <div class="editor-glow"></div>
+
+
+          <div class="editor-header">
+
+            <div class="editor-badge">
+
+              <i class="bi bi-stars"></i>
+
+              {{ 'Редактирование' if is_edit else 'Творческая студия' }}
+
+            </div>
+
+            <h1 class="editor-title">
+
+              <i class="bi {{ 'bi-pencil-square' if is_edit else 'bi-feather' }}"></i>
+
+              {{ 'Редактировать книгу' if is_edit else 'Написать книгу' }}
+
+            </h1>
+
+            <p class="editor-subtitle">
+
+              {{ 'Внесите изменения в своё произведение'
+                 if is_edit
+                 else 'Создайте историю, которая останется в памяти читателей ✨' }}
+
+            </p>
+
+          </div>
+
+
+          <form method="POST"
+                action=""
+                enctype="multipart/form-data"
+                class="editor-form">
+
             {{ form.hidden_tag() }}
 
-            <div class="mb-4">
-              {{ form.title.label(class="form-label fw-bold text-muted") }} {{
-              form.title(class="form-control form-control-lg bg-light",
-              style="border-radius: 15px; border: 1px solid #e0e7ff;") }} {% for
-              error in form.title.errors %}
-              <div class="text-danger mt-1 small">{{ error }}</div>
+
+            <div class="form-group-custom">
+
+              {{ form.title.label(class="form-label custom-label") }}
+
+              {{ form.title(
+                  class="form-control custom-input",
+                  placeholder="Название вашей книги..."
+              ) }}
+
+              {% for error in form.title.errors %}
+
+              <div class="text-danger mt-2 small">
+                {{ error }}
+              </div>
+
               {% endfor %}
+
             </div>
 
-            <div class="mb-4">
-              {{ form.cover.label(class="form-label fw-bold text-muted") }} {{
-              form.cover(class="form-control bg-light", style="border-radius:
-              15px;") }}
-              <div class="form-text">
-                {% if is_edit and book.cover_url %} Текущая обложка сохранена.
-                Загрузите новую, чтобы изменить её. {% else %} Рекомендуемый
-                размер: 400x600px {% endif %}
+
+            <div class="form-group-custom">
+
+              {{ form.cover.label(class="form-label custom-label") }}
+
+              <div class="upload-box">
+
+                <div class="upload-icon">
+                  <i class="bi bi-image"></i>
+                </div>
+
+                {{ form.cover(
+                    class="form-control custom-file-input"
+                ) }}
+
+                <div class="upload-text">
+
+                  {% if is_edit and book.cover_url %}
+
+                    Текущая обложка сохранена.
+                    Загрузите новую для замены ✨
+
+                  {% else %}
+
+                    Рекомендуемый размер:
+                    400×600px
+
+                  {% endif %}
+
+                </div>
+
               </div>
+
               {% for error in form.cover.errors %}
-              <div class="text-danger mt-1 small">{{ error }}</div>
-              {% endfor %}
-            </div>
 
-            <div class="mb-4">
-              {{ form.description.label(class="form-label fw-bold text-muted")
-              }} {{ form.description(class="form-control bg-light", rows="3",
-              style="border-radius: 15px; border: 1px solid #e0e7ff;") }}
-              <div class="form-text">
-                Короткая аннотация (о чем ваша книга).
+              <div class="text-danger mt-2 small">
+                {{ error }}
               </div>
+
+              {% endfor %}
+
+            </div>
+
+
+            <div class="form-group-custom">
+
+              {{ form.description.label(class="form-label custom-label") }}
+
+              {{ form.description(
+                  class="form-control custom-textarea small-textarea",
+                  rows="4",
+                  placeholder="Краткое описание книги..."
+              ) }}
+
+              <div class="helper-text">
+                Короткая аннотация для читателей
+              </div>
+
               {% for error in form.description.errors %}
-              <div class="text-danger mt-1 small">{{ error }}</div>
+
+              <div class="text-danger mt-2 small">
+                {{ error }}
+              </div>
+
               {% endfor %}
+
             </div>
 
-            <div class="mb-5">
-              {{ form.content.label(class="form-label fw-bold text-muted") }} {{
-              form.content(class="form-control bg-light", rows="15",
-              style="border-radius: 15px; border: 1px solid #e0e7ff;") }} {% for
-              error in form.content.errors %}
-              <div class="text-danger mt-1 small">{{ error }}</div>
+
+            <div class="form-group-custom">
+
+              {{ form.content.label(class="form-label custom-label") }}
+
+              {{ form.content(
+                  class="form-control custom-textarea content-textarea",
+                  rows="16",
+                  placeholder="Начните писать свою историю..."
+              ) }}
+
+              {% for error in form.content.errors %}
+
+              <div class="text-danger mt-2 small">
+                {{ error }}
+              </div>
+
               {% endfor %}
+
             </div>
 
-            <div class="d-grid gap-2">
-              {{ form.submit(class="btn btn-lg shadow-sm text-white",
-              value="Сохранить изменения" if is_edit else "Опубликовать книгу",
-              style="background: linear-gradient(135deg, #391fb8, #8b5cf6);
-              border-radius: 15px; border: none;") }}
-              <a
-                href="{{ url_for('main.my_shelf') }}"
-                class="btn btn-light btn-lg text-muted"
-                style="border-radius: 15px"
-                >Отмена</a
-              >
+
+            <div class="buttons-group">
+
+              <button type="submit"
+                      class="publish-btn">
+
+                <i class="bi bi-magic"></i>
+
+                {{ 'Сохранить изменения'
+                   if is_edit
+                   else 'Опубликовать книгу' }}
+
+              </button>
+
+              <a href="{{ url_for('main.my_shelf') }}"
+                 class="cancel-btn">
+
+                Отмена
+
+              </a>
+
             </div>
+
           </form>
+
         </div>
+
       </div>
+
     </div>
+
   </div>
+
 </div>
+
+<style>
+
+
+
+body {
+  background:
+    radial-gradient(circle at top left, #8b5cf6 0%, #140b22 40%),
+    radial-gradient(circle at bottom right, #5b21b6 0%, transparent 30%),
+    #0f0717;
+
+  min-height: 100vh;
+
+  color: white;
+}
+
+
+
+.editor-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 36px;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(22px);
+
+  padding: 45px;
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,0.35);
+}
+
+
+
+.editor-glow {
+  position: absolute;
+
+  top: -150px;
+  right: -150px;
+
+  width: 320px;
+  height: 320px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle,
+      rgba(139,92,246,0.35),
+      transparent 70%);
+}
+
+.editor-header {
+  text-align: center;
+
+  margin-bottom: 45px;
+}
+
+.editor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 22px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: #d8b4fe;
+
+  margin-bottom: 25px;
+}
+
+.editor-title {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+
+  font-weight: 900;
+
+  margin-bottom: 18px;
+
+  background:
+    linear-gradient(to right, white, #d8b4fe);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.editor-subtitle {
+  color: rgba(255,255,255,0.7);
+
+  font-size: 1.05rem;
+}
+
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+
+.custom-label {
+  color: rgba(255,255,255,0.85);
+
+  margin-bottom: 12px;
+
+  font-weight: 600;
+}
+
+
+.custom-input,
+.custom-textarea {
+  border-radius: 20px;
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  background:
+    rgba(255,255,255,0.06);
+
+  color: white;
+
+  padding: 18px 22px;
+
+  transition: 0.3s;
+}
+
+.custom-input {
+  height: 64px;
+
+  font-size: 1.05rem;
+}
+
+.custom-textarea {
+  resize: none;
+
+  line-height: 1.8;
+}
+
+.custom-input:focus,
+.custom-textarea:focus {
+  background:
+    rgba(255,255,255,0.1);
+
+  color: white;
+
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 0.25rem rgba(139,92,246,0.2);
+}
+
+.custom-input::placeholder,
+.custom-textarea::placeholder {
+  color: rgba(255,255,255,0.4);
+}
+
+
+.small-textarea {
+  min-height: 120px;
+}
+
+.content-textarea {
+  min-height: 420px;
+
+  font-size: 1rem;
+}
+
+
+.helper-text {
+  margin-top: 10px;
+
+  color: rgba(255,255,255,0.5);
+
+  font-size: 0.9rem;
+}
+
+
+.upload-box {
+  border-radius: 28px;
+
+  border:
+    2px dashed rgba(192,132,252,0.25);
+
+  background:
+    rgba(255,255,255,0.04);
+
+  padding: 40px 25px;
+
+  text-align: center;
+
+  transition: 0.35s;
+}
+
+.upload-box:hover {
+  background:
+    rgba(255,255,255,0.07);
+
+  border-color:
+    rgba(192,132,252,0.45);
+}
+
+.upload-icon {
+  font-size: 3rem;
+
+  color: #c084fc;
+
+  margin-bottom: 20px;
+}
+
+.custom-file-input {
+  display: block;
+
+  width: 100%;
+
+  text-align: center;
+
+  background: transparent !important;
+  border: none !important;
+
+  color: transparent;
+}
+
+.custom-file-input::file-selector-button {
+  display: block;
+
+  margin: 0 auto 18px auto;
+
+  border: none;
+
+  border-radius: 14px;
+
+  padding: 12px 22px;
+
+  background:
+    linear-gradient(135deg, #8b5cf6, #6d28d9);
+
+  color: white;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.custom-file-input::file-selector-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 30px rgba(139,92,246,0.35);
+}
+
+.upload-text {
+  color: rgba(255,255,255,0.5);
+
+  font-size: 0.92rem;
+}
+
+
+.buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  margin-top: 10px;
+}
+
+.publish-btn {
+  height: 64px;
+
+  border: none;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(135deg, #8b5cf6, #6d28d9);
+
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  transition: 0.35s;
+
+  box-shadow:
+    0 15px 40px rgba(139,92,246,0.35);
+}
+
+.publish-btn:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 22px 55px rgba(139,92,246,0.5);
+}
+
+.cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 58px;
+
+  border-radius: 18px;
+
+  text-decoration: none;
+
+  background:
+    rgba(255,255,255,0.06);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  color: rgba(255,255,255,0.75);
+
+  transition: 0.3s;
+}
+
+.cancel-btn:hover {
+  background:
+    rgba(255,255,255,0.1);
+
+  color: white;
+}
+
+
+@media (max-width: 768px) {
+
+  .editor-card {
+    padding: 30px 22px;
+  }
+
+  .editor-title {
+    font-size: 2.5rem;
+  }
+
+  .content-textarea {
+    min-height: 320px;
+  }
+
+}
+
+</style>
+
 {% endblock %}

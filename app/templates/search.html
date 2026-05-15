@@ -1,237 +1,764 @@
-{% extends "base.html" %} {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-10">
-    <div class="text-center mb-5">
-      <h1 class="display-5 fw-bold">Поиск книг</h1>
-      <p class="text-muted">Введите название или автора</p>
-    </div>
+{% extends "base.html" %}
 
-    <div class="card mb-5 shadow-sm border-0 bg-light rounded-4">
-      <div class="card-body p-4">
-        <form
-          action=""
-          method="post"
-          class="d-flex align-items-center gap-2"
-          novalidate
-        >
-          {{ form.hidden_tag() }}
+{% block content %}
 
-          <div class="flex-grow-1 position-relative search-box">
-            <span class="search-icon"> 🔍 </span>
+<div class="search-page">
 
-            {{ form.query( class="form-control form-control-lg rounded-pill ps-5
-            pe-5", placeholder="Например: Potter", id="searchInput" ) }}
+  <div class="container py-5">
 
-            <span class="clear-icon" onclick="clearInput()"> ✖ </span>
 
-            {% for error in form.query.errors %}
-            <div class="text-danger small mt-1">{{ error }}</div>
-            {% endfor %}
-          </div>
+    <div class="search-header text-center">
 
-          {{ form.submit( class="btn btn-lg rounded-pill px-4",
-          style="background: linear-gradient(90deg, #5f63f2, #7b61ff); border:
-          none; color: white;" ) }}
-        </form>
-        {% if recent_searches %}
-        <div class="mt-3">
-          <small class="text-muted me-2">Недавние поиски:</small>
-          <div class="d-flex flex-wrap gap-2 d-inline-block">
-            {% for s_query in recent_searches %}
-            <a
-              href="{{ url_for('main.search', q=s_query) }}"
-              class="badge rounded-pill text-decoration-none px-3 py-2"
-              style="
-                background-color: rgba(123, 97, 255, 0.1);
-                color: #7b61ff;
-                border: 1px solid rgba(123, 97, 255, 0.2);
-              "
-            >
-              {{ s_query }}
-            </a>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
+      <div class="search-badge">
+        <i class="bi bi-stars"></i>
+        Поиск по библиотеке
       </div>
+
+      <h1 class="search-title">
+        Найди свою <br>
+        следующую книгу
+      </h1>
+
+      <p class="search-subtitle">
+        Открой новые истории, авторов и миры ✨
+      </p>
+
     </div>
 
-    <style>
-      .search-box {
-        position: relative;
-      }
 
-      .search-box input {
-        padding-left: 45px !important;
-        padding-right: 45px !important;
-      }
+    <div class="search-card">
 
-      .search-icon {
-        position: absolute;
-        top: 50%;
-        left: 15px;
-        transform: translateY(-50%);
-        font-size: 18px;
-        color: #888;
-      }
+      <form action=""
+            method="post"
+            novalidate>
 
-      .clear-icon {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        font-size: 16px;
-        color: #888;
-        cursor: pointer;
-        display: block !important;
-      }
+        {{ form.hidden_tag() }}
 
-      .clear-icon:hover {
-        color: #000;
-      }
+        <div class="search-box">
 
-      .form-control {
-        border: 1px solid #dcdcdc;
-      }
+          <i class="bi bi-search search-icon"></i>
 
-      .form-control:focus {
-        border-color: #7b61ff;
-        box-shadow: 0 0 0 0.2rem rgba(123, 97, 255, 0.2);
-      }
-    </style>
+          {{ form.query(
+              class="form-control search-input",
+              placeholder="Например: Гарри Поттер",
+              id="searchInput"
+          ) }}
 
-    <script>
-      const input = document.getElementById("searchInput");
-      const clearBtn = document.querySelector(".clear-icon");
+          <button type="button"
+                  class="clear-btn"
+                  id="clearBtn">
 
-      input.addEventListener("input", () => {
-        clearBtn.style.display = input.value ? "block" : "none";
-      });
+            <i class="bi bi-x-lg"></i>
 
-      function clearInput() {
-        input.value = "";
-        clearBtn.style.display = "none";
-        input.focus();
-      }
-    </script>
+          </button>
+
+        </div>
+
+        {% for error in form.query.errors %}
+        <div class="text-danger small mt-2">
+          {{ error }}
+        </div>
+        {% endfor %}
+
+        <div class="search-actions">
+
+          {{ form.submit(
+              class="btn search-btn"
+          ) }}
+
+        </div>
+
+      </form>
+
+      {% if recent_searches %}
+
+      <div class="recent-searches">
+
+        <div class="recent-title">
+          Недавние поиски
+        </div>
+
+        <div class="recent-tags">
+
+          {% for s_query in recent_searches %}
+
+          <a href="{{ url_for('main.search', q=s_query) }}"
+             class="recent-tag">
+
+            {{ s_query }}
+
+          </a>
+
+          {% endfor %}
+
+        </div>
+      </div>
+
+      {% endif %}
+
+    </div>
+
 
     {% if books %}
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for book in books %}
-      <div class="col">
-        <div class="card h-100 shadow-sm border-0 bg-white">
-          <div class="row g-0">
-            <div class="col-4">
-              {% if book.cover_url %}
-              <img
-                src="{{ book.cover_url }}"
-                class="img-fluid rounded-start h-100 w-100"
-                style="object-fit: cover"
-                alt="Обложка"
-              />
-              {% else %}
-              <img
-                src="{{ url_for('static', filename='images/plug.png') }}"
-                class="img-fluid rounded-start h-100 w-100"
-                style="object-fit: cover"
-                alt="Обложка отсутствует"
-              />
-              {% endif %}
-            </div>
-            <div class="col-8">
-              <div class="card-body d-flex flex-column h-100">
-                <h5 class="card-title fw-bold">
-                  {% if book.key %}
-                  <a
-                    href="{{ url_for('main.book_details', ol_id=book.key.lstrip('/'), q=form.query.data) }}"
-                    class="text-decoration-none text-dark"
-                  >
-                    {{ book.title }}
-                  </a>
-                  {% else %} {{ book.title }} {% endif %}
-                </h5>
-                <p class="card-text text-muted mb-1 small">
-                  <strong>Автор:</strong> {{ book.author }}
-                </p>
 
-                {% if book.first_publish_year %}
-                <p class="card-text mb-2 small">
-                  <span class="badge bg-light text-dark border"
-                    >Год: {{ book.first_publish_year }}</span
-                  >
-                </p>
+    <div class="results-header">
+
+      <h2>
+        Найдено книг:
+        <span>{{ books|length }}</span>
+      </h2>
+
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+
+      {% for book in books %}
+
+      <div class="col">
+
+        <div class="result-card">
+
+
+          <div class="result-image-wrapper">
+
+            {% if book.cover_url %}
+
+            <img src="{{ book.cover_url }}"
+                 class="result-image"
+                 alt="Обложка">
+
+            {% else %}
+
+            <img src="{{ url_for('static', filename='images/plug.png') }}"
+                 class="result-image"
+                 alt="Нет обложки">
+
+            {% endif %}
+
+            <div class="image-overlay"></div>
+
+          </div>
+
+          <div class="result-content">
+
+            <div>
+
+              <h4 class="book-title">
+
+                {% if book.key %}
+
+                <a href="{{ url_for('main.book_details',
+                                    ol_id=book.key.lstrip('/'),
+                                    q=form.query.data) }}">
+
+                  {{ book.title }}
+
+                </a>
+
+                {% else %}
+
+                {{ book.title }}
+
                 {% endif %}
 
-                <div class="mt-auto">
-                  {% if current_user.is_authenticated %}
-                  <form
-                    action="{{ url_for('main.add_to_shelf') }}"
-                    method="post"
-                  >
-                    <input
-                      type="hidden"
-                      name="last_search_query"
-                      value="{{ form.query.data }}"
-                    />
+              </h4>
 
-                    <input
-                      type="hidden"
-                      name="title"
-                      value="{{ book.title }}"
-                    />
-                    <input
-                      type="hidden"
-                      name="author"
-                      value="{{ book.author }}"
-                    />
-                    <input
-                      type="hidden"
-                      name="genre"
-                      value="{{ book.genre }}"
-                    />
-                    <input type="hidden" name="isbn" value="{{ book.isbn }}" />
-                    <input
-                      type="hidden"
-                      name="cover_url"
-                      value="{{ book.cover_url }}"
-                    />
-
-                    <div class="input-group input-group-sm mb-2">
-                      <select name="status" class="form-select">
-                        <option value="Хочу прочитать">Хочу прочитать</option>
-                        <option value="Читаю">Читаю</option>
-                        <option value="Прочитано">Прочитано</option>
-                      </select>
-                    </div>
-
-                    <button type="submit" class="btn btn-sm btn-success w-100">
-                      Добавить на полку
-                    </button>
-                  </form>
-                  {% else %}
-                  <a
-                    href="{{ url_for('auth.login') }}"
-                    class="btn btn-sm btn-outline-secondary w-100"
-                  >
-                    Войдите, чтобы добавить
-                  </a>
-                  {% endif %}
-                </div>
+              <div class="book-author">
+                <i class="bi bi-person"></i>
+                {{ book.author }}
               </div>
+
+              {% if book.first_publish_year %}
+
+              <div class="book-year">
+
+                <i class="bi bi-calendar3"></i>
+                {{ book.first_publish_year }}
+
+              </div>
+
+              {% endif %}
+
             </div>
+
+
+            <div class="mt-auto">
+
+              {% if current_user.is_authenticated %}
+
+              <form action="{{ url_for('main.add_to_shelf') }}"
+                    method="post">
+
+                <input type="hidden"
+                       name="last_search_query"
+                       value="{{ form.query.data }}">
+
+                <input type="hidden"
+                       name="title"
+                       value="{{ book.title }}">
+
+                <input type="hidden"
+                       name="author"
+                       value="{{ book.author }}">
+
+                <input type="hidden"
+                       name="genre"
+                       value="{{ book.genre }}">
+
+                <input type="hidden"
+                       name="isbn"
+                       value="{{ book.isbn }}">
+
+                <input type="hidden"
+                       name="cover_url"
+                       value="{{ book.cover_url }}">
+
+                <select name="status"
+                        class="form-select custom-select mb-3">
+
+                  <option value="Хочу прочитать">
+                    Хочу прочитать
+                  </option>
+
+                  <option value="Читаю">
+                    Читаю
+                  </option>
+
+                  <option value="Прочитано">
+                    Прочитано
+                  </option>
+
+                </select>
+
+                <button type="submit"
+                        class="btn add-btn w-100">
+
+                  <i class="bi bi-plus-circle"></i>
+                  Добавить на полку
+
+                </button>
+
+              </form>
+
+              {% else %}
+
+              <a href="{{ url_for('auth.login') }}"
+                 class="btn login-btn w-100">
+
+                Войти для добавления
+
+              </a>
+
+              {% endif %}
+
+            </div>
+
           </div>
+
         </div>
+
       </div>
+
       {% endfor %}
+
     </div>
-    {% elif form.query.data and request.method == 'POST' or
-    (request.args.get('q') and not books) %}
-    <div class="text-center py-5">
-      <p class="mt-3 text-muted">
-        По запросу "<strong>{{ form.query.data }}</strong>" ничего не найдено.
+
+    {% elif form.query.data and request.method == 'POST'
+       or (request.args.get('q') and not books) %}
+
+
+    <div class="empty-state">
+
+      <div class="empty-icon">
+        <i class="bi bi-search-heart"></i>
+      </div>
+
+      <h3>Ничего не найдено</h3>
+
+      <p>
+        Попробуй изменить запрос или найти другую книгу ✨
       </p>
+
     </div>
+
     {% endif %}
+
   </div>
 </div>
+
+<style>
+
+
+
+body {
+  background:
+    radial-gradient(circle at top left, #8b5cf6 0%, #140b22 45%),
+    radial-gradient(circle at bottom right, #5b21b6 0%, transparent 30%),
+    #0f0717;
+
+  color: white;
+}
+
+
+.search-header {
+  margin-bottom: 50px;
+}
+
+.search-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 22px;
+
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(12px);
+
+  margin-bottom: 25px;
+
+  color: #d8b4fe;
+}
+
+.search-title {
+  font-size: clamp(3rem, 7vw, 5rem);
+
+  font-weight: 900;
+
+  line-height: 1.05;
+
+  margin-bottom: 20px;
+
+  background: linear-gradient(to right, white, #d8b4fe);
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.search-subtitle {
+  color: rgba(255,255,255,0.7);
+
+  font-size: 1.1rem;
+}
+
+
+
+.search-card {
+  background: rgba(255,255,255,0.06);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(18px);
+
+  border-radius: 30px;
+
+  padding: 35px;
+
+  margin-bottom: 50px;
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.3);
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-input {
+  height: 70px;
+
+  border-radius: 999px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  background: rgba(255,255,255,0.08);
+
+  color: white;
+
+  padding-left: 65px;
+
+  padding-right: 60px;
+
+  font-size: 1.1rem;
+}
+
+.search-input:focus {
+  background: rgba(255,255,255,0.12);
+
+  color: white;
+
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 0.25rem rgba(139,92,246,0.25);
+}
+
+.search-input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 24px;
+
+  transform: translateY(-50%);
+
+  color: #c084fc;
+
+  font-size: 1.2rem;
+}
+
+.clear-btn {
+  position: absolute;
+
+  top: 50%;
+  right: 20px;
+
+  transform: translateY(-50%);
+
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  border: none;
+
+  background: rgba(255,255,255,0.08);
+
+  color: white;
+
+  display: none;
+
+  transition: 0.3s;
+}
+
+.clear-btn:hover {
+  background: rgba(255,255,255,0.16);
+}
+
+.search-actions {
+  margin-top: 25px;
+}
+
+.search-btn {
+  background:
+    linear-gradient(135deg, #8b5cf6, #6d28d9);
+
+  border: none;
+
+  color: white;
+
+  padding: 14px 28px;
+
+  border-radius: 18px;
+
+  font-weight: 600;
+
+  transition: 0.35s;
+
+  box-shadow:
+    0 12px 30px rgba(139,92,246,0.35);
+}
+
+.search-btn:hover {
+  transform: translateY(-3px);
+
+  color: white;
+
+  box-shadow:
+    0 18px 40px rgba(139,92,246,0.5);
+}
+
+
+
+.recent-searches {
+  margin-top: 30px;
+}
+
+.recent-title {
+  margin-bottom: 15px;
+
+  color: rgba(255,255,255,0.6);
+}
+
+.recent-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.recent-tag {
+  text-decoration: none;
+
+  padding: 10px 18px;
+
+  border-radius: 999px;
+
+  background: rgba(139,92,246,0.12);
+
+  border: 1px solid rgba(139,92,246,0.2);
+
+  color: #d8b4fe;
+
+  transition: 0.3s;
+}
+
+.recent-tag:hover {
+  transform: translateY(-2px);
+
+  background: rgba(139,92,246,0.2);
+
+  color: white;
+}
+
+
+
+.results-header {
+  margin-bottom: 30px;
+}
+
+.results-header span {
+  color: #c084fc;
+}
+
+.result-card {
+  display: flex;
+
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 28px;
+
+  background: rgba(255,255,255,0.06);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  backdrop-filter: blur(18px);
+
+  transition: 0.4s;
+}
+
+.result-card:hover {
+  transform: translateY(-8px);
+
+  box-shadow:
+    0 25px 60px rgba(139,92,246,0.22);
+}
+
+
+
+.result-image-wrapper {
+  width: 180px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+}
+
+.result-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition: 0.5s;
+}
+
+.result-card:hover .result-image {
+  transform: scale(1.08);
+}
+
+.image-overlay {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(to right,
+      transparent,
+      rgba(15,7,23,0.35));
+}
+
+
+
+.result-content {
+  padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.book-title a {
+  color: white;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+.book-title a:hover {
+  color: #d8b4fe;
+}
+
+.book-author,
+.book-year {
+  color: rgba(255,255,255,0.65);
+
+  margin-top: 10px;
+
+  font-size: 0.95rem;
+}
+
+
+
+.custom-select {
+  background: rgba(255,255,255,0.08);
+
+  color: white;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 14px;
+}
+
+.custom-select:focus {
+  border-color: #8b5cf6;
+
+  box-shadow:
+    0 0 0 0.2rem rgba(139,92,246,0.25);
+}
+
+
+
+.add-btn {
+  background:
+    linear-gradient(135deg, #8b5cf6, #6d28d9);
+
+  border: none;
+
+  color: white;
+
+  border-radius: 14px;
+
+  padding: 12px;
+
+  transition: 0.35s;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+
+  color: white;
+
+  box-shadow:
+    0 10px 30px rgba(139,92,246,0.35);
+}
+
+.login-btn {
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  color: white;
+
+  border-radius: 14px;
+
+  padding: 12px;
+}
+
+
+.empty-state {
+  text-align: center;
+
+  padding: 100px 20px;
+}
+
+.empty-icon {
+  width: 110px;
+  height: 110px;
+
+  margin: auto;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(139,92,246,0.12);
+
+  font-size: 3rem;
+
+  color: #c084fc;
+
+  margin-bottom: 30px;
+}
+
+.empty-state h3 {
+  font-weight: 800;
+
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  color: rgba(255,255,255,0.65);
+}
+
+
+
+@media (max-width: 768px) {
+
+  .result-card {
+    flex-direction: column;
+  }
+
+  .result-image-wrapper {
+    width: 100%;
+    height: 260px;
+  }
+
+  .search-card {
+    padding: 25px;
+  }
+
+  .search-title {
+    font-size: 3rem;
+  }
+
+}
+
+</style>
+
+<script>
+
+const input = document.getElementById("searchInput");
+const clearBtn = document.getElementById("clearBtn");
+
+function toggleClearButton() {
+  clearBtn.style.display = input.value ? "flex" : "none";
+}
+
+toggleClearButton();
+
+input.addEventListener("input", toggleClearButton);
+
+clearBtn.addEventListener("click", () => {
+  input.value = "";
+  input.focus();
+  toggleClearButton();
+});
+
+</script>
+
 {% endblock %}

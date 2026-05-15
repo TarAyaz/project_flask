@@ -1,119 +1,413 @@
-{% extends "base.html" %} {% block content %}
-<div class="container">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="display-6 fw-bold text-primary">Моя книжная полка</h1>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="main-header mb-5">
     <div>
-      <a href="{{ url_for('main.create_book') }}" class="btn btn-primary btn-sm me-2 shadow-sm">
-        <i class="bi bi-pen"></i> Написать книгу
+      <h1 class="main-title">
+        <i class="bi bi-bookshelf"></i>
+        Моя книжная полка
+      </h1>
+      <p class="text-light opacity-75 mb-0">
+        Мир историй, который принадлежит тебе ✨
+      </p>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="{{ url_for('main.create_book') }}"
+         class="btn btn-magenta">
+        <i class="bi bi-vector-pen"></i>
+        Написать книгу
       </a>
-      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm shadow-sm">
-        <i class="bi bi-plus-lg"></i> Найти новую книгу
+
+      <a href="{{ url_for('main.search') }}"
+         class="btn btn-glass">
+        <i class="bi bi-search"></i>
+        Найти книгу
       </a>
     </div>
   </div>
 
-  <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="pills-reading-tab" data-bs-toggle="pill" data-bs-target="#pills-reading" type="button" role="tab">
-        Читаю
-        <span class="badge bg-light text-primary ms-1">{{ shelf.reading|length }}</span>
+  <ul class="nav nav-pills custom-tabs mb-5 justify-content-center" id="pills-tab" role="tablist">
+
+    {% set tabs = [
+      ('reading', 'Читаю', 'book-half', shelf.reading),
+      ('plan', 'В планах', 'bookmark-heart', shelf.plan),
+      ('completed', 'Прочитано', 'check2-circle', shelf.completed),
+      ('custom', 'Мои книги', 'stars', shelf.custom)
+    ] %}
+
+    {% for category, label, icon, books in tabs %}
+    <li class="nav-item mx-1" role="presentation">
+      <button
+        class="nav-link {% if category == 'reading' %}active{% endif %}"
+        id="pills-{{ category }}-tab"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-{{ category }}"
+        type="button"
+        role="tab"
+      >
+        <i class="bi bi-{{ icon }}"></i>
+        {{ label }}
+
+        <span class="custom-badge">
+          {{ books|length }}
+        </span>
       </button>
     </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="pills-plan-tab" data-bs-toggle="pill" data-bs-target="#pills-plan" type="button" role="tab">
-        В планах
-        <span class="badge bg-light text-primary ms-1">{{ shelf.plan|length }}</span>
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="pills-completed-tab" data-bs-toggle="pill" data-bs-target="#pills-completed" type="button" role="tab">
-        Прочитано
-        <span class="badge bg-light text-primary ms-1">{{ shelf.completed|length }}</span>
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="pills-custom-tab" data-bs-toggle="pill" data-bs-target="#pills-custom" type="button" role="tab">
-        Мои произведения
-        <span class="badge bg-light text-primary ms-1">{{ shelf.custom|length }}</span>
-      </button>
-    </li>
+    {% endfor %}
   </ul>
 
-  <div class="tab-content" id="pills-tabContent">
+  <div class="tab-content">
+
     {% for category, books in [('reading', shelf.reading), ('plan', shelf.plan), ('completed', shelf.completed), ('custom', shelf.custom)] %}
-    <div class="tab-pane fade {% if category == 'reading' %}show active{% endif %}" id="pills-{{ category }}" role="tabpanel">
+
+    <div class="tab-pane fade {% if category == 'reading' %}show active{% endif %}"
+         id="pills-{{ category }}"
+         role="tabpanel">
+
       {% if books %}
-      <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-4">
+
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+
         {% for book in books %}
         <div class="col">
-          <div class="card h-100 border-0 shadow-sm book-card">
-            <img
-              src="{{ book.cover_url or url_for('static', filename='images/plug.png') }}"
-              class="card-img-top rounded shadow-sm"
-              style="height: 200px; object-fit: cover"
-              alt="Обложка"
-            />
-            <div class="card-body p-2 text-center d-flex flex-column">
-              <h6 class="card-title mb-1 text-truncate" title="{{ book.title }}">
+
+          <div class="book-card">
+
+            <div class="book-cover-wrapper">
+              <img
+                src="{{ book.cover_url or url_for('static', filename='images/plug.png') }}"
+                class="book-cover"
+                alt="Обложка"
+              >
+
+              <div class="book-overlay"></div>
+            </div>
+
+            <div class="book-body">
+
+              <h5 class="book-title" title="{{ book.title }}">
                 {{ book.title }}
-              </h6>
-              <p class="card-text small text-muted text-truncate mb-2">
+              </h5>
+
+              <p class="book-author">
                 {{ book.author }}
               </p>
-        
+
               <div class="mt-auto">
+
                 {% if category == 'custom' %}
-                  <div class="d-flex gap-1 mb-2">
-                    <a href="{{ url_for('main.read_my_book', book_id=book.id) }}" class="btn btn-sm btn-primary flex-grow-1" style="border-radius: 10px;">
-                      <i class="bi bi-book"></i>
-                    </a>
-                    <a href="{{ url_for('main.edit_book', book_id=book.id) }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 10px;" title="Редактировать">
-                      <i class="bi bi-pencil"></i>
-                    </a>
-                  </div>
-                  <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Точно удалить ваше произведение?')">
-                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none w-100" style="text-decoration: none; font-size: 0.8rem;">
-                      Удалить
-                    </button>
-                  </form>
+
+                <div class="d-flex gap-2 mb-2">
+
+                  <a href="{{ url_for('main.read_my_book', book_id=book.id) }}"
+                     class="btn btn-read flex-grow-1">
+                    <i class="bi bi-book"></i>
+                  </a>
+
+                  <a href="{{ url_for('main.edit_book', book_id=book.id) }}"
+                     class="btn btn-edit">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+
+                </div>
+
+                <form action="{{ url_for('main.delete_book', book_id=book.id) }}"
+                      method="post"
+                      onsubmit="return confirm('Удалить произведение?')">
+
+                  <button type="submit"
+                          class="btn-delete">
+                    Удалить
+                  </button>
+
+                </form>
+
                 {% else %}
-                  <form action="{{ url_for('main.update_book_status', book_id=book.id) }}" method="post" class="mb-1">
-                    <select name="status" class="form-select form-select-sm mb-1" onchange="this.form.submit()">
-                      <option value="Хочу прочитать" {% if book.status == 'Хочу прочитать' %}selected{% endif %}>В планы</option>
-                      <option value="Читаю" {% if book.status == 'Читаю' %}selected{% endif %}>Читаю</option>
-                      <option value="Прочитано" {% if book.status == 'Прочитано' %}selected{% endif %}>Прочитано</option>
-                    </select>
-                  </form>
-          
-                  <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="post" onsubmit="return confirm('Удалить книгу?')">
-                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 shadow-none w-100" style="text-decoration: none; font-size: 0.8rem;">
-                      Удалить
-                    </button>
-                  </form>
+
+                <form action="{{ url_for('main.update_book_status', book_id=book.id) }}"
+                      method="post"
+                      class="mb-2">
+
+                  <select name="status"
+                          class="form-select custom-select"
+                          onchange="this.form.submit()">
+
+                    <option value="Хочу прочитать"
+                      {% if book.status == 'Хочу прочитать' %}selected{% endif %}>
+                      В планы
+                    </option>
+
+                    <option value="Читаю"
+                      {% if book.status == 'Читаю' %}selected{% endif %}>
+                      Читаю
+                    </option>
+
+                    <option value="Прочитано"
+                      {% if book.status == 'Прочитано' %}selected{% endif %}>
+                      Прочитано
+                    </option>
+
+                  </select>
+
+                </form>
+
+                <form action="{{ url_for('main.delete_book', book_id=book.id) }}"
+                      method="post"
+                      onsubmit="return confirm('Удалить книгу?')">
+
+                  <button type="submit"
+                          class="btn-delete">
+                    Удалить
+                  </button>
+
+                </form>
+
                 {% endif %}
+
               </div>
             </div>
           </div>
         </div>
         {% endfor %}
+
       </div>
+
       {% else %}
-      <div class="text-center py-5">
-        <p class="text-muted">Здесь пока пусто...</p>
+
+      <div class="empty-state">
+        <i class="bi bi-moon-stars"></i>
+        <h3>Пока пусто</h3>
+        <p>Добавь первую книгу и создай свою атмосферную библиотеку ✨</p>
       </div>
+
       {% endif %}
     </div>
+
     {% endfor %}
   </div>
 </div>
 
 <style>
-  .book-card:hover {
-    transform: translateY(-5px);
-    transition: 0.3s;
-  }
-  .nav-pills .nav-link.active {
-    background-color: #0d6efd;
-  }
+
+body {
+  background:
+    radial-gradient(circle at top left, #6f42c1 0%, #1b1028 45%),
+    #120d1d;
+  min-height: 100vh;
+}
+
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.main-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 0 20px rgba(180, 120, 255, 0.6);
+}
+
+
+.btn-magenta {
+  background: linear-gradient(135deg, #c77dff, #7b2cbf);
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 14px;
+  transition: 0.3s;
+  box-shadow: 0 0 20px rgba(199, 125, 255, 0.35);
+}
+
+.btn-magenta:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 30px rgba(199, 125, 255, 0.55);
+  color: white;
+}
+
+.btn-glass {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  color: white;
+  border-radius: 14px;
+  padding: 10px 18px;
+  transition: 0.3s;
+}
+
+.btn-glass:hover {
+  background: rgba(255,255,255,0.15);
+  color: white;
+}
+
+
+.custom-tabs .nav-link {
+  background: rgba(255,255,255,0.06);
+  color: #ddd;
+  border-radius: 14px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  transition: 0.3s;
+}
+
+.custom-tabs .nav-link:hover {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.12);
+}
+
+.custom-tabs .nav-link.active {
+  background: linear-gradient(135deg, #9d4edd, #7b2cbf);
+  color: white;
+  box-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
+}
+
+.custom-badge {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  font-size: 0.75rem;
+}
+
+
+.book-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 24px;
+  overflow: hidden;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: 0.4s;
+  height: 100%;
+  position: relative;
+}
+
+.book-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow:
+    0 10px 40px rgba(140, 82, 255, 0.35),
+    0 0 20px rgba(199, 125, 255, 0.2);
+}
+
+.book-cover-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.book-cover {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  transition: 0.5s;
+}
+
+.book-card:hover .book-cover {
+  transform: scale(1.08);
+}
+
+.book-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+    rgba(18,13,29,0.7),
+    transparent 60%);
+}
+
+.book-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 260px);
+}
+
+.book-title {
+  color: white;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.book-author {
+  color: #cbb6e6;
+  font-size: 0.9rem;
+  margin-bottom: 14px;
+}
+
+
+.custom-select {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+}
+
+.custom-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(180, 120, 255, 0.3);
+  border-color: #c77dff;
+}
+
+
+
+.btn-read,
+.btn-edit {
+  border: none;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.btn-read {
+  background: linear-gradient(135deg, #9d4edd, #7b2cbf);
+  color: white;
+}
+
+.btn-edit {
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+.btn-read:hover,
+.btn-edit:hover {
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #ff8fa3;
+  width: 100%;
+  font-size: 0.85rem;
+  transition: 0.3s;
+}
+
+.btn-delete:hover {
+  color: #ff4d6d;
+  transform: scale(1.03);
+}
+
+
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #ddd;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #c77dff;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  color: white;
+  font-weight: 700;
+}
+
 </style>
+
 {% endblock %}
